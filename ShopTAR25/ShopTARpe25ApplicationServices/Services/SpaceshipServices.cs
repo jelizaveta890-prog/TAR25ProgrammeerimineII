@@ -1,12 +1,13 @@
 ﻿using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
+using ShopTARpe25.Core.Servicesinterface;
 using ShopTARpe25.Data;
 
 
 namespace ShopTARpe25.ApplicationServices.Services
 {
 
-    public class SpaceshipServices
+    public class SpaceshipServices : ISpaceshipServices
     {
 
         private readonly ShopTARpe25Context _context;
@@ -41,9 +42,11 @@ namespace ShopTARpe25.ApplicationServices.Services
 
             await _context.Spaceships.AddAsync(domain);
             await _context.SaveChangesAsync();
+       
 
             return domain;
 
+            
 
         }
     }
