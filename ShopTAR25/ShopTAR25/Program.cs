@@ -1,3 +1,9 @@
+using Microsoft.AspNetCore.Connections;
+using Microsoft.EntityFrameworkCore;
+using ShopTARpe25.ApplicationServices.Services;
+using ShopTARpe25.Core.Servicesinterface;
+using ShopTARpe25.Data;
+
 namespace ShopTAR25
 {
     public class Program
@@ -8,6 +14,15 @@ namespace ShopTAR25
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddScoped<ISpaceshipServices, SpaceshipServices>();
+
+            //selleks, et tuleb installida Microsoft.EntityFrameworkCore.SqlServer
+            //ja Microsoft.EntityFrameworkCore.Tools NuGet paketid
+            //kui installitud, siis viitad  namespacesis Microsoft.EntityFrameworkCore-le
+            builder.Services.AddDbContext<ShopTARpe25Context>(options =>
+                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
             var app = builder.Build();
 
