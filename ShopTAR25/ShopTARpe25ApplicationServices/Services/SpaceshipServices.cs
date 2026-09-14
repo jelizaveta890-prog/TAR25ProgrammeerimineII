@@ -28,9 +28,9 @@ namespace ShopTARpe25.ApplicationServices.Services
             domain.Id = dto.Id;
             domain.Name = dto.Name;
             domain.Classification = dto.Classification;
-            domain.BuildDate = dto.BuildDate;
+            domain.BuiltDate = dto.BuiltDate;
             domain.Crew = dto.Crew;
-            domain.Egienepower = dto.Egienepower;
+            domain.EnginePower = dto.EnginePower;
             domain.CreatedAt = dto.CreatedAt;
             domain.ModifiedAt = dto.ModifiedAt;
 
