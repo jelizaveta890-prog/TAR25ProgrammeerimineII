@@ -1,3 +1,49 @@
-﻿<div>
-    <a asp-action="Create" asp-controller="Spaceship" type="submit" class="btn btn-primary">Create</a>
+﻿@model IEnumerable<ShopTAR25.Models.Spaceship.SpaceshipIndexViewModel>
+
+@{
+    ViewData["Title"] = "Spaceships";
+}
+
+<div class="container mt-4">
+    <div class="mb-3">
+        <a asp-action="Create" asp-controller="Spaceship" class="btn btn-primary">Create</a>
+    </div>
+
+    <h1 class="display-6 fw-bold mb-4">Spaceships</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nr</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Built Date</th>
+                <th>Crew</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int rowNumber = 1;
+            }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@rowNumber</td>
+                    <td>@item.Name</td>
+                    <td>@item.Classification</td>
+                    <td>@item.BuiltDate?.ToShortDateString()</td>
+                    <td>@item.Crew</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Details</a>
+                            <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Update</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                rowNumber++;
+            }
+        </tbody>
+    </table>
 </div>

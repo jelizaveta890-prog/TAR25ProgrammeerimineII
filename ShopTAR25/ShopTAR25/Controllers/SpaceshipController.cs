@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ShopTAR25.Models.Spaceship;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.Servicesinterface;
+using ShopTARpe25.Data;
 
 namespace ShopTAR25.Controllers
 {
@@ -10,21 +11,37 @@ namespace ShopTAR25.Controllers
     {
         private readonly ISpaceshipServices _spaceshipServices;
 
-
+        private readonly ShopTARpe25Context _context;
+        //teha constructor et saaks kasutada teenust, mis on 
+        //defineeritud ISpaceshipServices liideses
+        //lisage Context
         public SpaceshipController
             (
-                ISpaceshipServices spaceshipServices
+                ISpaceshipServices spaceshipServices,
+                ShopTARpe25Context context
             )
         {
             _spaceshipServices = spaceshipServices;
+            _context = context;
         }
 
-        //teha constructor et saaks kasutada teenust, mis on 
-        //defineeritud ISpaceshipServices liideses
-        public IActionResult Index()
+
+public IActionResult Index()
+{
+   
+      var result = _context.Spaceships
+        .Select(x => new SpaceshipIndexViewModel
         {
-            return View();
-        }
+            Id = x.Id,
+            Name = x.Name,
+            Classification = x.Classification,
+            BuiltDate = x.BuiltDate,
+            Crew = x.Crew,
+            Enginepower = x.EnginePower
+        }).ToList(); 
+
+      return View(result);
+}
 
         //kui kasutja klikib "Create" nuppu, siis see meetod käivitatakse 
         //tagastab kasutaja vormi, kuhu saab sisestada andmed
@@ -48,9 +65,9 @@ namespace ShopTAR25.Controllers
             {
                 Name = vm.Name,
                 Classification = vm.Classification,
-                BuiltDate = vm.BuildDate,
+                BuiltDate = vm.BuiltDate,
                 Crew = vm.Crew,
-                EnginePower = vm.Egienepower
+                EnginePower = vm.Enginepower
             };
 
             var result = await _spaceshipServices.Create(dto);
