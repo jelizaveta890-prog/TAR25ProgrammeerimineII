@@ -1,6 +1,7 @@
 ﻿using AspNetCoreGeneratedDocument;
 using Microsoft.AspNetCore.Mvc;
 using ShopTAR25.Models.Spaceship;
+using ShopTAR25.Views.Spaceship;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.Servicesinterface;
 using ShopTARpe25.Data;
@@ -74,6 +75,38 @@ public IActionResult Index()
             
 
             return RedirectToAction(nameof(Index));
+        }
+
+        //tuleb teha Details meetod 
+        //see kutsub välja interfacest service meetodi
+        
+        [HttpGet] 
+        public async Task<IActionResult> Details(Guid id) 
+        {
+            
+            var spaceship = await _spaceshipServices.DetailsAsync(id);
+            
+            //veakäsitlus
+            //suunab vatele NotFound, kui andmed ei ole
+            if (spaceship == null)
+            {
+                return NotFound();
+            }
+
+            //tuleb teha viewModel ja see siin välja kutsuda 
+            //ära map-ida vm ja domain
+            var vm = new SpaceshipDetailsViewModel();
+
+            vm.Id = spaceship.Id;
+            vm.Name = spaceship.Name;
+            vm.Classification = spaceship.Classification;
+            vm.BuiltDate = spaceship.BuiltDate;
+            vm.Crew = spaceship.Crew;
+            vm.EnginePower = spaceship.EnginePower;
+            vm.CreatedAt = spaceship.CreatedAt;
+            vm.ModifiedAt = spaceship.ModifiedAt;
+
+            return View(vm);
         }
     }
 }

@@ -6,6 +6,7 @@ using ShopTARpe25.Data;
 
 namespace ShopTAR25
 {
+    //Update-Database: EntityFrameworkCore\Update-Database
     public class Program
     {
         public static void Main(string[] args)
