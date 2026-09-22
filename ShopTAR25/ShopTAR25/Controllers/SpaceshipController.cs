@@ -192,24 +192,13 @@ namespace ShopTAR25.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(SpaceshipDeleteViewModel vm)
+        public async Task<IActionResult> DeleteConfirmation(Guid id)
         {
+            
+            var result = await _spaceshipServices.Delete(id);
 
-            var dto = new SpaceshipDto()
-            {
-                Id = vm.Id,
-                Name = vm.Name,
-                Classification = vm.Classification,
-                BuiltDate = vm.BuiltDate,
-                Crew = vm.Crew,
-                EnginePower = vm.Enginepower,
-                CreatedAt = vm.CreatedAt,
-                ModifiedAt = vm.ModifiedAt
-            };
 
-            var result = await _spaceshipServices.Delete(Guid id);
-
-            if (result == null)
+            if (id == null)
             {
                 return RedirectToAction(nameof(Index));
             }

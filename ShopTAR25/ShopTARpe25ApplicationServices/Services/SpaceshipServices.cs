@@ -79,8 +79,6 @@ namespace ShopTARpe25.ApplicationServices.Services
 
             return spaceship;
         }
-
-        ///-----------------------------------------------------DELETE
         public async Task<Spaceship> Delete(Guid id)
         {
             var result = await _context.Spaceships
