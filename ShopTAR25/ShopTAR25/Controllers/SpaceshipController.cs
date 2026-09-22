@@ -190,6 +190,7 @@ namespace ShopTAR25.Controllers
 
             return View(vm);
         }
+        test
 
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmation(Guid id)
@@ -206,6 +207,6 @@ namespace ShopTAR25.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
+        
     }
 }
