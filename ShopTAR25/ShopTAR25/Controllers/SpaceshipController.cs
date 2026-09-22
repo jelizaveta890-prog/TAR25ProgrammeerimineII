@@ -27,22 +27,22 @@ namespace ShopTAR25.Controllers
         }
 
 
-public IActionResult Index()
-{
-   
-      var result = _context.Spaceships
-        .Select(x => new SpaceshipIndexViewModel
+        public IActionResult Index()
         {
-            Id = x.Id,
-            Name = x.Name,
-            Classification = x.Classification,
-            BuiltDate = x.BuiltDate,
-            Crew = x.Crew,
-            Enginepower = x.EnginePower
-        }).ToList(); 
 
-      return View(result);
-}
+            var result = _context.Spaceships
+              .Select(x => new SpaceshipIndexViewModel
+              {
+                  Id = x.Id,
+                  Name = x.Name,
+                  Classification = x.Classification,
+                  BuiltDate = x.BuiltDate,
+                  Crew = x.Crew,
+                  Enginepower = x.EnginePower
+              }).ToList();
+
+            return View(result);
+        }
 
         //kui kasutja klikib "Create" nuppu, siis see meetod käivitatakse 
         //tagastab kasutaja vormi, kuhu saab sisestada andmed
@@ -57,12 +57,12 @@ public IActionResult Index()
         [HttpPost]
         public async Task<IActionResult> Create(SpaceshipCreateViewModel vm)
         {
-            
+
             //luua vaheinstains, mis sisaldab andmeid, mis on saadud vormis
             //need andmed tuleb edasi saata dto-sse, mis on mõeldud andmebaasi salvestamiseks
 
-            
-            var dto = new  SpaceshipDto
+
+            var dto = new SpaceshipDto
             {
                 Name = vm.Name,
                 Classification = vm.Classification,
@@ -72,20 +72,20 @@ public IActionResult Index()
             };
 
             var result = await _spaceshipServices.Create(dto);
-            
+
 
             return RedirectToAction(nameof(Index));
         }
 
         //tuleb teha Details meetod 
         //see kutsub välja interfacest service meetodi
-        
-        [HttpGet] 
-        public async Task<IActionResult> Details(Guid id) 
+
+        [HttpGet]
+        public async Task<IActionResult> Details(Guid id)
         {
-            
+
             var spaceship = await _spaceshipServices.DetailsAsync(id);
-            
+
             //veakäsitlus
             //suunab vatele NotFound, kui andmed ei ole
             if (spaceship == null)
@@ -108,7 +108,7 @@ public IActionResult Index()
 
             return View(vm);
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> Update(Guid id)
         {
@@ -135,7 +135,7 @@ public IActionResult Index()
 
             return View(vm);
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> Update(SpaceshipUpdateViewModel vm)
         {
@@ -153,7 +153,62 @@ public IActionResult Index()
             };
 
             var result = await _spaceshipServices.Update(dto);
-           
+
+            if (result == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+
+            return RedirectToAction(nameof(Index));
+        }
+        //-------------------------------------DELETE
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+
+            var spaceship = await _spaceshipServices.DetailsAsync(id);
+
+
+            if (spaceship == null)
+            {
+                return NotFound();
+            }
+
+
+            var vm = new SpaceshipDeleteViewModel();
+
+            vm.Id = spaceship.Id;
+            vm.Name = spaceship.Name;
+            vm.Classification = spaceship.Classification;
+            vm.BuiltDate = spaceship.BuiltDate;
+            vm.Crew = spaceship.Crew;
+            vm.Enginepower = spaceship.EnginePower;
+            vm.CreatedAt = spaceship.CreatedAt;
+            vm.ModifiedAt = spaceship.ModifiedAt;
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(SpaceshipDeleteViewModel vm)
+        {
+
+            var dto = new SpaceshipDto()
+            {
+                Id = vm.Id,
+                Name = vm.Name,
+                Classification = vm.Classification,
+                BuiltDate = vm.BuiltDate,
+                Crew = vm.Crew,
+                EnginePower = vm.Enginepower,
+                CreatedAt = vm.CreatedAt,
+                ModifiedAt = vm.ModifiedAt
+            };
+
+            var result = await _spaceshipServices.Delete(Guid id);
+
             if (result == null)
             {
                 return RedirectToAction(nameof(Index));
