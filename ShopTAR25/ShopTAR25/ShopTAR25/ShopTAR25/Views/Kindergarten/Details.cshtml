@@ -1,0 +1,33 @@
+@model ShopTAR25.Models.Kindergarten.KindergartenDetailsViewModel
+
+<h1>Details</h1>
+
+<div>
+    <h4>Kindergarten</h4>
+    <hr />
+
+    <dl class="row">
+        <dt class="col-sm-3">Id</dt>
+        <dd class="col-sm-9">@Model.Id</dd>
+
+        <dt class="col-sm-3">Group Name</dt>
+        <dd class="col-sm-9">@Model.GroupName</dd>
+
+        <dt class="col-sm-3">Children Count</dt>
+        <dd class="col-sm-9">@Model.ChildrenCount</dd>
+
+        <dt class="col-sm-3">Kindergarten Name</dt>
+        <dd class="col-sm-9">@Model.KindergartenName</dd>
+
+        <dt class="col-sm-3">Teacher Name</dt>
+        <dd class="col-sm-9">@Model.TeacherName</dd>
+
+        <dt class="col-sm-3">Created At</dt>
+        <dd class="col-sm-9">@Model.CreatedAt</dd>
+
+        <dt class="col-sm-3">Updated At</dt>
+        <dd class="col-sm-9">@Model.UpdatedAt</dd>
+    </dl>
+
+    <a asp-action="Index" asp-controller="Kindergarten" class="btn btn-primary">Back to List</a>
+</div>

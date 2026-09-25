@@ -1,0 +1,3 @@
+# TAR25ProgrammeerimineII
+
+EntityFrameworkCore\

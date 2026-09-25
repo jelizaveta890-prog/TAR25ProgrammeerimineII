@@ -1,0 +1,53 @@
+@model IEnumerable<ShopTAR25.Models.Kindergarten.KindergartenIndexViewModel>
+
+@{
+    ViewData["Title"] = "Kindergartens";
+}
+
+<div class="container mt-4">
+    <div class="mb-3">
+        <a asp-action="Create" asp-controller="Kindergarten" class="btn btn-primary">Create</a>
+    </div>
+
+    <h1 class="display-6 fw-bold mb-4">Kindergartens</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nr</th>
+                <th>Group Name</th>
+                <th>Children Count</th>
+                <th>Kindergarten Name</th>
+                <th>Teacher Name</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int rowNumber = 1;
+            }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@rowNumber</td>
+                    <td>@item.GroupName</td>
+                    <td>@item.ChildrenCount</td>
+                    <td>@item.KindergartenName</td>
+                    <td>@item.TeacherName</td>
+                    <td>@item.CreatedAt</td>
+                    <td>@item.UpdatedAt</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
+                            <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-success btn-sm">Update</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                rowNumber++;
+            }
+        </tbody>
+    </table>
+</div>
