@@ -1,0 +1,57 @@
+﻿@model IEnumerable<ShopTARpe25.Models.Spaceship.SpaceshipIndexViewModel>
+
+@* Nupu tegemine *@
+<div>
+    <a asp-action="Create"
+           asp-controller="Spaceship"
+           class="btn btn-primary">
+        Create
+    </a>
+</div>
+
+<!--Main branch-->
+
+@* Loendi kuvamine *@
+<h2>Spaceships</h2>
+
+<table class="table"> @* iga tulba pealkirjad *@
+    <thead>
+        <tr>
+            <th>Nr</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Built Date</th>
+            <th>Crew</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int rownumber = 1; @* id Nr'id, loendus algab ühest *@
+        }
+        @foreach (var ship in Model)
+        {
+            <tr>
+                <td>@rownumber</td> @* järjekorranumber *@
+                <td>@ship.Name</td>
+                <td>@ship.Classification</td>
+                <td>@ship.BuildDate</td>
+                <td>@ship.Crew</td>
+                <td>
+                    @* Nupud: details, edit, delete vvv *@
+                    <a asp-action="Details"asp-route-id="@ship.Id"
+                           class="btn btn-warning">Details
+                    </a>
+
+                    <a asp-action="Update"asp-route-id="@ship.Id"
+                           class="btn btn-primary">Update
+                    </a>
+
+                    <a asp-action="Delete"asp-route-id="@ship.Id"
+                        class="btn btn-danger">Delete
+                    </a>
+                </td>
+            </tr>
+            rownumber++; @* iga uus rida on +1 id number, ehk üks arv suurem *@
+        }
+    </tbody>
+</table>
