@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ShopTARpe25.Core.Dto
 {
-    internal interface FileToApiDto
+    public interface FileToApiDto
     {
     }
 }

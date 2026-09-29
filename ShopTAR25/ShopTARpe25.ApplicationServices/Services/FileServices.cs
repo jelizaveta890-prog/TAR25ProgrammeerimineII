@@ -33,25 +33,31 @@ namespace ShopTARpe25.ApplicationServices.Services
                 {
                     //tee directory wwwrooti alla
                     Directory.Exists(_webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\");
+                }
+                foreach (var file in dto.Files)
+                {
+                    //meil on vaja teha muutuja nimega uploadsFolder
+                    //sinna muutuja taha on vaja Path kombineeria
+                    string uploadsFolder = Path.Combine(_webHost.ContentRootPath, "wwwroot", "multipleFileUpload");
+                    //igale failile unikaalne Guid selle nime ette
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.Name;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                    foreach (var file in dto.Files)
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
-                        //meil on vaja teha muutuja nimega uploadsFolder
-                        //sinna muutuja taha on vaja Path kombineerida
-                        string uniqueFileName = Path.Combine(_webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\");
-                        string iniqueFileName = Path.NewGuid().ToString() + "_" + file.Name;
+                        file.CopyTo(fileStream);
 
-                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        //domaini teha FileToApi
+                        FileToApi path = new FileToApi
                         {
-                            file.CopyTo(fileStream);
-                            //domaini teha File to Api
-                            FileToApi path = new FileToApi
-                            {
+                            //tuleb ära mappida
+                            //domain ja ??
+                            Id = Guid.NewGuid(),
+                            ExistingFilePath = uniqueFileName,
+                            SpaceshipId = domain.Id
+                        };
 
-                            }
-                        }
+                        _context.FileToApis.AddAsync(path);
                     }
                 }
             }
