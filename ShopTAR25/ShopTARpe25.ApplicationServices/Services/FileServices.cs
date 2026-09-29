@@ -47,7 +47,7 @@ namespace ShopTARpe25.ApplicationServices.Services
                         {
                             file.CopyTo(fileStream);
                             //domaini teha File to Api
-                            FileToApiDto
+                            
                         }
                     }
                 }
