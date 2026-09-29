@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ShopTARpe25.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,13 +16,12 @@ namespace ShopTARpe25.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Classification = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BuildDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Crew = table.Column<int>(type: "int", nullable: true),
-                    EnginePower = table.Column<int>(type: "int", nullable: true),
+                    GroupName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ChildrenCount = table.Column<int>(type: "int", nullable: true),
+                    KindergartenName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TeacherName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {

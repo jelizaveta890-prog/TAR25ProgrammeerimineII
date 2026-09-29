@@ -5,23 +5,24 @@ using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.Serviceinterface;
 using ShopTARpe25.Data;
+using ShopTARpe25.Models.Kindergarden;
 using ShopTARpe25.Models.Spaceship;
 using System.Reflection.Metadata.Ecma335;
 
 namespace ShopTAR25.Controllers
 {
-    public class SpaceshipController : Controller
+    public class KindergardenController : Controller
     {
-        private readonly IspaceshipServices _spaceshipService;
+        private readonly IKindergardenServices _spaceshipService;
         private readonly ShopTARpe25Context _context;
 
         //teha constructor et saaks kasutada teenust, mis on
         //defineeritud IspaceshipServices liideses
 
         //lisage context juurde
-        public SpaceshipController
+        public KindergardenController
             (
-                IspaceshipServices ispaceshipService,
+                IKindergardenServices ispaceshipService,
                 ShopTARpe25Context context
 
             )
@@ -35,13 +36,13 @@ namespace ShopTAR25.Controllers
         {
             //loome vaheinstantsi domaini ja viewModeli vahel.
             var result = _context.Spaceships
-                .Select(x => new SpaceshipIndexViewModel
+                .Select(x => new KindergardenIndexViewModel
                 {
                     Id = x.Id,
-                    Name = x.Name,
-                    Classification = x.Classification,
-                    BuildDate = x.BuildDate,
-                    Crew = x.Crew,
+                    GroupName = x.GroupName,
+                    ChildrenCount = x.ChildrenCount,
+                    KindergartenName = x.KindergartenName,
+                    TeacherName = x.TeacherName,
                 }).ToList(); // <-- See laeb andmed andmebaasist reaalselt sisse
 
             return View(result); // <-- See saadab andmed Index.cshtml failile
@@ -59,18 +60,17 @@ namespace ShopTAR25.Controllers
         //saadab andmed serverisse, kus need salvestatakse andmebaasi
 
         [HttpPost]
-        public async Task<IActionResult> Create(SpaceshipCreateViewModel vm)
+        public async Task<IActionResult> Create(KindergardenCreateViewModel vm)
         {
             //luua vaheinstants, mis sisaldab andmeid, mis on saadud vormist
             //need andmed tuleb edasi saata dto-sse, mis on mõeldud andmebaasi salvestamis
 
-            var dto = new SpaceshipDto
+            var dto = new KindergardenDto
             {
-                Name = vm.Name,
-                Classification = vm.Classification,
-                BuildDate = vm.BuildDate,
-                Crew = vm.Crew,
-                EnginePower = vm.EnginePower,
+                GroupName = vm.GroupName,
+                ChildrenCount = vm.ChildrenCount,
+                KindergartenName = vm.KindergartenName,
+                TeacherName = vm.TeacherName,
             };
 
             //kutsuda teenuse meetodit, mis salvestab andmed andmebaasi
@@ -97,16 +97,15 @@ namespace ShopTAR25.Controllers
             //tuleb teha viewmodel ja see siin välja kutsuda
             //ära map'ida vm ja doamin
 
-            var vm = new SpaceshipDetailsViewModel();
+            var vm = new KindergardenDetailsViewModel();
 
             vm.Id = spaceship.Id;
-            vm.Name = spaceship.Name;
-            vm.Classification = spaceship.Classification;
-            vm.BuildDate = spaceship.BuildDate;
-            vm.EnginePower = spaceship.EnginePower;
-            vm.Crew = spaceship.Crew;
+            vm.GroupName = spaceship.GroupName;
+            vm.ChildrenCount = spaceship.ChildrenCount;
+            vm.KindergartenName = spaceship.KindergartenName;
+            vm.TeacherName = spaceship.TeacherName;
             vm.CreatedAt = spaceship.CreatedAt;
-            vm.ModifiedAt = spaceship.ModifiedAt;
+            vm.UpdatedAt = spaceship.UpdatedAt;
 
             return View(vm);
         }
@@ -127,33 +126,32 @@ namespace ShopTAR25.Controllers
             //tuleb teha viewmodel ja see siin välja kutsuda
             //ära map'ida vm ja doamin
 
-            var vm = new SpaceshipUpdateViewModel();
+            var vm = new KindergardenUpdateViewModel();
 
             vm.Id = spaceship.Id;
-            vm.Name = spaceship.Name;
-            vm.Classification = spaceship.Classification;
-            vm.BuildDate = spaceship.BuildDate;
-            vm.EnginePower = spaceship.EnginePower;
-            vm.Crew = spaceship.Crew;
+            vm.GroupName = spaceship.GroupName;
+            vm.ChildrenCount = spaceship.ChildrenCount;
+            vm.KindergartenName = spaceship.KindergartenName;
+            vm.TeacherName = spaceship.TeacherName;
             vm.CreatedAt = spaceship.CreatedAt;
-            vm.ModifiedAt = spaceship.ModifiedAt;
+            vm.UpdatedAt = spaceship.UpdatedAt;
 
             return View(vm);
         }
         [HttpPost]
-        public async Task<IActionResult> Update(SpaceshipUpdateViewModel vm)
+        public async Task<IActionResult> Update(KindergardenUpdateViewModel vm)
         {
-            var dto = new SpaceshipDto()
+            var dto = new KindergardenDto
             {
                 Id = vm.Id,
-                Name = vm.Name,
-                Classification = vm.Classification,
-                BuildDate = vm.BuildDate,
-                EnginePower = vm.EnginePower,
-                Crew = vm.Crew,
-                CreatedAt = vm.CreatedAt,
-                ModifiedAt = vm.ModifiedAt
+                GroupName = vm.GroupName,
+                ChildrenCount = vm.ChildrenCount ?? 0, 
+                KindergartenName = vm.KindergartenName,
+                TeacherName = vm.TeacherName,
+                CreatedAt = vm.CreatedAt ?? DateTime.Now, 
+                UpdatedAt = vm.UpdatedAt ?? DateTime.Now
             };
+
             var result = await _spaceshipService.Update(dto);
 
             if (result == null)
@@ -175,16 +173,15 @@ namespace ShopTAR25.Controllers
                 return NotFound();
             }
 
-            var vm = new SpaceshipDeleteViewModel();
+            var vm = new KindergardenDeleteViewModel();
 
             vm.Id = spaceship.Id;
-            vm.Name = spaceship.Name;
-            vm.Classification = spaceship.Classification;
-            vm.BuildDate = spaceship.BuildDate;
-            vm.EnginePower = spaceship.EnginePower;
-            vm.Crew = spaceship.Crew;
+            vm.GroupName = spaceship.GroupName;
+            vm.ChildrenCount = spaceship.ChildrenCount;
+            vm.KindergartenName = spaceship.KindergartenName;
+            vm.TeacherName = spaceship.TeacherName;
             vm.CreatedAt = spaceship.CreatedAt;
-            vm.ModifiedAt = spaceship.ModifiedAt;
+            vm.UpdatedAt = spaceship.UpdatedAt;
 
             return View(vm);
         }
