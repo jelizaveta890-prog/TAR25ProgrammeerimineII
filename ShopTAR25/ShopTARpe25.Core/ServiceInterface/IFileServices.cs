@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ShopTARpe25.Core.ServiceInterface
+﻿namespace ShopTARpe25.Core.ServiceInterface
 {
-    internal class IFileServices
+    public interface IFileServices
     {
     }
 }
