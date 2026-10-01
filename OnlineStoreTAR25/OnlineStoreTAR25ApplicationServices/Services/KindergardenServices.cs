@@ -5,24 +5,22 @@ using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.Serviceinterface;
 using ShopTARpe25.Data;
+using System;
+using System.Threading.Tasks;
 
 namespace ShopTARpe25.ApplicationServices.Services
 {
-
     public class KindergardenServices : IKindergardenServices
     {
         private readonly ShopTARpe25Context _context;
 
-        public KindergardenServices
-            (
-                ShopTARpe25Context context
-            )
+        public KindergardenServices(ShopTARpe25Context context)
         {
             _context = context;
         }
+
         public async Task<Kindergarden> Create(KindergardenDto dto)
         {
-
             Kindergarden domain = new();
 
             domain.Id = dto.Id;
@@ -33,60 +31,67 @@ namespace ShopTARpe25.ApplicationServices.Services
             domain.CreatedAt = DateTime.Now;
             domain.UpdatedAt = DateTime.Now;
 
+            var realEstateDomain = new RealEstate
+            {
+                Id = domain.Id,
+                CreatedAt = domain.CreatedAt ?? DateTime.Now, // Избегаем конфликта типов null
+                UpdatedAt = domain.UpdatedAt ?? DateTime.Now
+            };
 
-            //siia tuleb kood, mis salvestab domain
-            //objecti andmebaasi
-            //tuleb kasutada repository'd, mis on
-            //defineeritud Core projectis
-            //konstruktori kaudu tuleb injectida repository
 
-            await _context.Spaceships.AddAsync(domain);
+            await _context.RealEstates.AddAsync(realEstateDomain);
             await _context.SaveChangesAsync();
-
 
             return domain;
         }
 
-        //siia teha uus meetod nimega DetailAsync
-        //see ainult pärib andmed contextist
-        public async Task<Kindergarden> DetailsAsync(Guid id) //otsitakse läbi id ehk tuleb Guid id panna
+        public async Task<Kindergarden> DetailsAsync(Guid id)
         {
-            var result = await _context.Spaceships
+            // ЗАПРОС: Ищем объект в таблице RealEstates
+            var realEstate = await _context.RealEstates
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            return result;
+            if (realEstate == null) return null;
 
+            // Возвращаем объект Kindergarten, чтобы не ломать контроллер и представления (Views)
+            return new Kindergarden
+            {
+                Id = realEstate.Id,
+                CreatedAt = realEstate.CreatedAt,
+                UpdatedAt = realEstate.UpdatedAt
+            };
         }
 
         public async Task<Kindergarden> Update(KindergardenDto dto)
         {
-            Kindergarden spaceship = new();
+            // ОБНОВЛЕНИЕ: Находим недвижимость в базе и обновляем её
+            var realEstate = await _context.RealEstates
+                .FirstOrDefaultAsync(x => x.Id == dto.Id);
 
-            spaceship.Id = dto.Id;
-            spaceship.GroupName = dto.GroupName;
-            spaceship.ChildrenCount = dto.ChildrenCount;
-            spaceship.KindergartenName = dto.KindergartenName;
-            spaceship.TeacherName = dto.TeacherName;
-            spaceship.CreatedAt = dto.CreatedAt;
-            spaceship.UpdatedAt = DateTime.Now;
+            if (realEstate != null)
+            {
+                realEstate.UpdatedAt = DateTime.Now;
 
-            _context.Spaceships.Update(spaceship);
-            await _context.SaveChangesAsync();
+                _context.RealEstates.Update(realEstate);
+                await _context.SaveChangesAsync();
+            }
 
-            return spaceship;
+            return new Kindergarden { Id = dto.Id };
         }
-        //DELETE ---------------------------------------------------
+
         public async Task<Kindergarden> Delete(Guid id)
         {
-            var result = await _context.Spaceships
+            // УДАЛЕНИЕ: Удаляем запись из таблицы RealEstates
+            var result = await _context.RealEstates
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            _context.Spaceships.Remove(result);
+            if (result != null)
+            {
+                _context.RealEstates.Remove(result);
+                await _context.SaveChangesAsync();
+            }
 
-            _context.Spaceships.Remove(result);
-            await _context.SaveChangesAsync();
-
-            return result;
+            return new Kindergarden { Id = id };
         }
     }
 }
