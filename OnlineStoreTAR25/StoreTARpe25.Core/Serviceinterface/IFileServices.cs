@@ -1,6 +1,6 @@
 ﻿namespace ShopTARpe25.Core.Serviceinterface
 {
-    public class IFileServices
+    public interface IFileServices
     {
 
     }

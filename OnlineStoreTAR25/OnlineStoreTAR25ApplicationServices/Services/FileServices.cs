@@ -42,17 +42,25 @@ namespace ShopTARpe25.ApplicationServices.Services
                     //sinna muutuja taha on vaja Path kombineerida
 
                     string uploadFolder = Path.Combine(_webHost.ContentRootPath, "wwwroot", "multipleFileUpload");
-                   //igale failile unikaalne Guid selle nime ette
+                    //igale failile unikaalne Guid selle nime ette
                     string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.Name;
                     string filePath = Path.Combine(uploadFolder, uniqueFileName);
 
                     using (var filestream = new FileStream(filePath, FileMode.Create))
-                    {
+                       
                         file.CopyTo(filestream);
-
-                        //domaini teha FileToApi
+                    
+                    FileToApi path = new FileToApi
+                    {
                         
-                    }
+
+                        Id = Guid.NewGuid(),
+                        ExistingFilePath = uniqueFileName,
+                        SpaceshipId = domain.Id
+
+                    };
+
+                    _context.FileToApis.AddAsync(path);
 
 
                 }
