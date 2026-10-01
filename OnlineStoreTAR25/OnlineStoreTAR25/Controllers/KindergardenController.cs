@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore; // Lisatud vajalik import ToListAsync jaoks
 using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.Serviceinterface;
 using ShopTARpe25.Data;
 using ShopTARpe25.Models.Kindergarden;
 using ShopTARpe25.Models.Spaceship;
-using System.Reflection.Metadata.Ecma335;
+using System;
+using System.Threading.Tasks;
 
 namespace ShopTAR25.Controllers
 {
@@ -16,55 +17,42 @@ namespace ShopTAR25.Controllers
         private readonly IKindergardenServices _spaceshipService;
         private readonly ShopTARpe25Context _context;
 
-        //teha constructor et saaks kasutada teenust, mis on
-        //defineeritud IspaceshipServices liideses
-
-        //lisage context juurde
         public KindergardenController
             (
                 IKindergardenServices ispaceshipService,
                 ShopTARpe25Context context
-
             )
         {
             _spaceshipService = ispaceshipService;
             _context = context;
         }
 
-
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            //loome vaheinstantsi domaini ja viewModeli vahel.
-            var result = _context.Spaceships
-                .Select(x => new KindergardenIndexViewModel
+          
+            var result = await _context.RealEstates
+                .Select(x => new KindergardenIndexViewModel 
                 {
                     Id = x.Id,
-                    GroupName = x.GroupName,
-                    ChildrenCount = x.ChildrenCount,
-                    KindergartenName = x.KindergartenName,
-                    TeacherName = x.TeacherName,
-                }).ToList(); // <-- See laeb andmed andmebaasist reaalselt sisse
+                    GroupName = x.Address, 
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt
+                })
+                .ToListAsync();
 
-            return View(result); // <-- See saadab andmed Index.cshtml failile
+            return View(result);
         }
 
-        [HttpGet]
-        //kui kasutaja klikib "Create" nuppu, siis see meetod käivitatakse
-        //tagastab kasutajale vormi, kuhu saab sisestada andmed
 
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
-        //kui oled teinud vormi, siis see meetod käivitatakse
-        //saadab andmed serverisse, kus need salvestatakse andmebaasi
 
         [HttpPost]
         public async Task<IActionResult> Create(KindergardenCreateViewModel vm)
         {
-            //luua vaheinstants, mis sisaldab andmeid, mis on saadud vormist
-            //need andmed tuleb edasi saata dto-sse, mis on mõeldud andmebaasi salvestamis
-
             var dto = new KindergardenDto
             {
                 GroupName = vm.GroupName,
@@ -73,71 +61,60 @@ namespace ShopTAR25.Controllers
                 TeacherName = vm.TeacherName,
             };
 
-            //kutsuda teenuse meetodit, mis salvestab andmed andmebaasi
             var result = await _spaceshipService.Create(dto);
 
             return RedirectToAction(nameof(Index));
         }
-        //tuleb teha details meetod
-        //see kutsub välja interfacest service meetodi
 
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
-
+            // Päritakse andmed baasist (teenus otsib RealEstates tabelist)
             var spaceship = await _spaceshipService.DetailsAsync(id);
 
-            //veakäsitlus
-            //suunab vatele NotFound, kui andmed ei ole
             if (spaceship == null)
             {
                 return NotFound();
             }
 
-            //tuleb teha viewmodel ja see siin välja kutsuda
-            //ära map'ida vm ja doamin
+            // Kuna andmed on tegelikult RealEstates tabelis, siis loeme puuduvad andmed otse sealt,
+            // et Details vaade ei jääks tühjaks
+            var dbRealEstate = await _context.RealEstates.FirstOrDefaultAsync(x => x.Id == id);
 
-            var vm = new KindergardenDetailsViewModel();
-
-            vm.Id = spaceship.Id;
-            vm.GroupName = spaceship.GroupName;
-            vm.ChildrenCount = spaceship.ChildrenCount;
-            vm.KindergartenName = spaceship.KindergartenName;
-            vm.TeacherName = spaceship.TeacherName;
-            vm.CreatedAt = spaceship.CreatedAt;
-            vm.UpdatedAt = spaceship.UpdatedAt;
+            var vm = new KindergardenDetailsViewModel
+            {
+                Id = spaceship.Id,
+                GroupName = dbRealEstate?.Address ?? "Määramata",
+                CreatedAt = spaceship.CreatedAt,
+                UpdatedAt = spaceship.UpdatedAt
+            };
 
             return View(vm);
         }
-        //UPDATE ------------------------------------------------------
+
         [HttpGet]
         public async Task<IActionResult> Update(Guid id)
         {
-
             var spaceship = await _spaceshipService.DetailsAsync(id);
 
-            //veakäsitlus
-            //suunab vatele NotFound, kui andmed ei ole
             if (spaceship == null)
             {
                 return NotFound();
             }
 
-            //tuleb teha viewmodel ja see siin välja kutsuda
-            //ära map'ida vm ja doamin
+            var dbRealEstate = await _context.RealEstates.FirstOrDefaultAsync(x => x.Id == id);
 
-            var vm = new KindergardenUpdateViewModel();
-
-            vm.Id = spaceship.Id;
-            vm.GroupName = spaceship.GroupName;
-            vm.ChildrenCount = spaceship.ChildrenCount;
-            vm.KindergartenName = spaceship.KindergartenName;
-            vm.TeacherName = spaceship.TeacherName;
-            vm.CreatedAt = spaceship.CreatedAt;
-            vm.UpdatedAt = spaceship.UpdatedAt;
+            var vm = new KindergardenUpdateViewModel
+            {
+                Id = spaceship.Id,
+                GroupName = dbRealEstate?.Address ?? "Määramata",
+                CreatedAt = spaceship.CreatedAt,
+                UpdatedAt = spaceship.UpdatedAt
+            };
 
             return View(vm);
         }
+
         [HttpPost]
         public async Task<IActionResult> Update(KindergardenUpdateViewModel vm)
         {
@@ -145,24 +122,15 @@ namespace ShopTAR25.Controllers
             {
                 Id = vm.Id,
                 GroupName = vm.GroupName,
-                ChildrenCount = vm.ChildrenCount ?? 0, 
-                KindergartenName = vm.KindergartenName,
-                TeacherName = vm.TeacherName,
-                CreatedAt = vm.CreatedAt ?? DateTime.Now, 
-                UpdatedAt = vm.UpdatedAt ?? DateTime.Now
+                CreatedAt = vm.CreatedAt ?? DateTime.Now,
+                UpdatedAt = DateTime.Now
             };
 
-            var result = await _spaceshipService.Update(dto);
+            await _spaceshipService.Update(dto);
 
-            if (result == null)
-            {
-                return RedirectToAction(nameof(Index));
-            }
             return RedirectToAction(nameof(Index));
-
         }
 
-        //DELETE -----------------------------------------------
         [HttpGet]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -173,30 +141,25 @@ namespace ShopTAR25.Controllers
                 return NotFound();
             }
 
-            var vm = new KindergardenDeleteViewModel();
+            var dbRealEstate = await _context.RealEstates.FirstOrDefaultAsync(x => x.Id == id);
 
-            vm.Id = spaceship.Id;
-            vm.GroupName = spaceship.GroupName;
-            vm.ChildrenCount = spaceship.ChildrenCount;
-            vm.KindergartenName = spaceship.KindergartenName;
-            vm.TeacherName = spaceship.TeacherName;
-            vm.CreatedAt = spaceship.CreatedAt;
-            vm.UpdatedAt = spaceship.UpdatedAt;
+            var vm = new KindergardenDeleteViewModel
+            {
+                Id = spaceship.Id,
+                GroupName = dbRealEstate?.Address ?? "Määramata",
+                CreatedAt = spaceship.CreatedAt,
+                UpdatedAt = spaceship.UpdatedAt
+            };
 
             return View(vm);
         }
+
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmation(Guid id)
         {
-            var result = await _spaceshipService.Delete(id);
+            await _spaceshipService.Delete(id);
 
-            if (id == null)
-            {
-                return RedirectToAction(nameof(Index));
-            }
             return RedirectToAction(nameof(Index));
-
         }
-
     }
 }

@@ -30,12 +30,13 @@ namespace ShopTARpe25.ApplicationServices.Services
             domain.TeacherName = dto.TeacherName;
             domain.CreatedAt = DateTime.Now;
             domain.UpdatedAt = DateTime.Now;
-
+          
             var realEstateDomain = new RealEstate
             {
                 Id = domain.Id,
-                CreatedAt = domain.CreatedAt ?? DateTime.Now, // Избегаем конфликта типов null
-                UpdatedAt = domain.UpdatedAt ?? DateTime.Now
+                CreatedAt = (DateTime)domain.CreatedAt,
+                UpdatedAt = (DateTime)domain.UpdatedAt,
+                Address = dto.GroupName ?? "Määramata aadress" 
             };
 
 
@@ -47,13 +48,11 @@ namespace ShopTARpe25.ApplicationServices.Services
 
         public async Task<Kindergarden> DetailsAsync(Guid id)
         {
-            // ЗАПРОС: Ищем объект в таблице RealEstates
             var realEstate = await _context.RealEstates
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (realEstate == null) return null;
 
-            // Возвращаем объект Kindergarten, чтобы не ломать контроллер и представления (Views)
             return new Kindergarden
             {
                 Id = realEstate.Id,
@@ -64,7 +63,6 @@ namespace ShopTARpe25.ApplicationServices.Services
 
         public async Task<Kindergarden> Update(KindergardenDto dto)
         {
-            // ОБНОВЛЕНИЕ: Находим недвижимость в базе и обновляем её
             var realEstate = await _context.RealEstates
                 .FirstOrDefaultAsync(x => x.Id == dto.Id);
 
@@ -81,7 +79,6 @@ namespace ShopTARpe25.ApplicationServices.Services
 
         public async Task<Kindergarden> Delete(Guid id)
         {
-            // УДАЛЕНИЕ: Удаляем запись из таблицы RealEstates
             var result = await _context.RealEstates
                 .FirstOrDefaultAsync(x => x.Id == id);
 
