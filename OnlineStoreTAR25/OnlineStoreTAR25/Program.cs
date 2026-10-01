@@ -20,7 +20,10 @@ namespace OnlineStoreTAR25
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            //see on depedency injection, mis vüimaldab meil kasutada teenuseid contrillerites
             builder.Services.AddScoped<IspaceshipServices, SpaceshipServices>();
+            builder.Services.AddScoped<IFileServices, FileServices>();
+
 
             //ühendame andmebaasiga vvv
             //selleks, et tuleb installida Microsoft.EntityFrameworkCore,SqlServer
