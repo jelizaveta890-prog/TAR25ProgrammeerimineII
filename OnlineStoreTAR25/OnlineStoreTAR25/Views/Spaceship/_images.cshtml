@@ -1,6 +1,10 @@
 ﻿@model ShopTARpe25.Models.Spaceship.ImageViewModel
 
-<div class="form-group row col-sm-4 offset-2">
-    <div>@Model.FilePath</div>
-    <img src="@Model.FilePath" alt="Image" class="img-fluid" />
-</div>
+<dl class="row">
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <img src="~/multipleFileUpload/@Model.FilePath" class="img-thumbnail" style="max-width: 300px; max-height: 300px;" alt="Spaceship Image" />
+        </div>
+    </div>
+</dl>
