@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ShopTARpe25.ApplicationServices.Services;
-using ShopTARpe25.Core.Serviceinterface;
+using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
 
 namespace OnlineStoreTAR25
@@ -21,7 +21,7 @@ namespace OnlineStoreTAR25
             builder.Services.AddControllersWithViews();
 
             //see on depedency injection, mis vüimaldab meil kasutada teenuseid contrillerites
-            builder.Services.AddScoped<IspaceshipServices, SpaceshipServices>();
+            builder.Services.AddScoped<ISpaceshipServices, SpaceshipServices>();
             builder.Services.AddScoped<IFileServices, FileServices>();
 
 

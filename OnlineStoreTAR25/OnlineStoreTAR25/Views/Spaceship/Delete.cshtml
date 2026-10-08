@@ -29,8 +29,8 @@
 
     <dl class="row">
         <div class="form-group row">
-            <label asp-for="BuildDate" class="col-sm-2 col-form-label"></label>
-            @Html.DisplayFor(model => model.BuildDate)
+            <label asp-for="BuiltDate" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.BuiltDate)
         </div>
     </dl>
 
@@ -61,6 +61,12 @@
             @Html.DisplayFor(model => model.ModifiedAt)
         </div>
     </dl>
+
+    @foreach (var file in Model.Images)
+    {
+        <partial name="_Images" model="file" />
+    }
+
 
     <hr />
     <form asp-action="DeleteConfirmation">

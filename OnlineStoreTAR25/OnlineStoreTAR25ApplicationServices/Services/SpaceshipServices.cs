@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Identity.Client;
 using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
-using ShopTARpe25.Core.Serviceinterface;
+using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
+
 
 namespace ShopTARpe25.ApplicationServices.Services
 {
 
-    public class SpaceshipServices : IspaceshipServices
+
+    public class SpaceshipServices : ISpaceshipServices
     {
         private readonly ShopTARpe25Context _context;
         private readonly IFileServices _fileServices;
@@ -17,52 +17,50 @@ namespace ShopTARpe25.ApplicationServices.Services
         public SpaceshipServices
             (
                 ShopTARpe25Context context,
-               IFileServices fileServices
+                IFileServices fileServices
             )
         {
             _context = context;
             _fileServices = fileServices;
         }
+
         public async Task<Spaceship> Create(SpaceshipDto dto)
         {
-
             Spaceship domain = new();
 
-            domain.Id = dto.Id;
+            domain.Id = Guid.NewGuid();
             domain.Name = dto.Name;
             domain.Classification = dto.Classification;
-            domain.BuildDate = dto.BuildDate;
+            domain.BuiltDate = dto.BuildDate;
             domain.Crew = dto.Crew;
             domain.EnginePower = dto.EnginePower;
             domain.CreatedAt = DateTime.Now;
             domain.ModifiedAt = DateTime.Now;
-            //peame saama File teenustes välja kutsuda meetod
-            //mis salvestab failid servisse
-             _fileServices.FileToApi(dto, domain);
+            //peame saama File teenuse välja kutsuda,
+            //mis salvestab failid serverisse
+            _fileServices.FilesToApi(dto, domain);
 
 
             //siia tuleb kood, mis salvestab domain
-            //objecti andmebaasi
-            //tuleb kasutada repository'd, mis on
-            //defineeritud Core projectis
+            //objekti andmebaasi
+            //tuleb kasutada repository'd, mis
+            //on defineeritud Core projektis
             //konstruktori kaudu tuleb injectida repository
 
             await _context.Spaceships.AddAsync(domain);
             await _context.SaveChangesAsync();
 
-
             return domain;
         }
 
-        //siia teha uus meetod nimega DetailAsync
-        //see ainult pärib andmed contextist
-        public async Task<Spaceship> DetailsAsync(Guid id) //otsitakse läbi id ehk tuleb Guid id panna
+        //siia teha meetod nimega DetailsAsync
+        //see ainult p'rib andmed contextist
+        public async Task<Spaceship> DetailsAsync(Guid id)
         {
             var result = await _context.Spaceships
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             return result;
-
         }
 
         public async Task<Spaceship> Update(SpaceshipDto dto)
@@ -72,7 +70,7 @@ namespace ShopTARpe25.ApplicationServices.Services
             spaceship.Id = dto.Id;
             spaceship.Name = dto.Name;
             spaceship.Classification = dto.Classification;
-            spaceship.BuildDate = dto.BuildDate;
+            spaceship.BuiltDate = dto.BuildDate;
             spaceship.Crew = dto.Crew;
             spaceship.EnginePower = dto.EnginePower;
             spaceship.CreatedAt = dto.CreatedAt;
@@ -83,13 +81,11 @@ namespace ShopTARpe25.ApplicationServices.Services
 
             return spaceship;
         }
-        //DELETE ---------------------------------------------------
+
         public async Task<Spaceship> Delete(Guid id)
         {
             var result = await _context.Spaceships
                 .FirstOrDefaultAsync(x => x.Id == id);
-
-            _context.Spaceships.Remove(result);
 
             _context.Spaceships.Remove(result);
             await _context.SaveChangesAsync();
