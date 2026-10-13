@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Identity.Client;
 using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.Serviceinterface;
@@ -23,25 +21,25 @@ namespace ShopTARpe25.ApplicationServices.Services
         {
             Kindergarden domain = new();
 
-            domain.Id = dto.Id;
-            domain.GroupName = dto.GroupName;
-            domain.ChildrenCount = dto.ChildrenCount;
-            domain.KindergartenName = dto.KindergartenName;
-            domain.TeacherName = dto.TeacherName;
+            domain.Id = Guid.NewGuid(); // Genereerime uue unikaalse ID
             domain.CreatedAt = DateTime.Now;
             domain.UpdatedAt = DateTime.Now;
-          
+
             var realEstateDomain = new RealEstate
             {
                 Id = domain.Id,
                 CreatedAt = (DateTime)domain.CreatedAt,
                 UpdatedAt = (DateTime)domain.UpdatedAt,
-                Address = dto.GroupName ?? "Määramata aadress" 
+                Address = dto.GroupName ?? "Määramata aadress",
+
+                // Võtame andmed otse dto-st, et vältida domeenimudeli puuduvate väljade vigu
+                ChildrenCount = dto.ChildrenCount,
+                KindergartenName = dto.KindergartenName ?? "Määramata lasteaed",
+                TeacherName = dto.TeacherName ?? "Määramata õpetaja"
             };
 
-
             await _context.RealEstates.AddAsync(realEstateDomain);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // Salvestab andmed turvaliselt andmebaasi
 
             return domain;
         }
@@ -53,6 +51,7 @@ namespace ShopTARpe25.ApplicationServices.Services
 
             if (realEstate == null) return null;
 
+            // Tagastame puhta seose baasist ilma vigaste väljadeta
             return new Kindergarden
             {
                 Id = realEstate.Id,
@@ -68,6 +67,11 @@ namespace ShopTARpe25.ApplicationServices.Services
 
             if (realEstate != null)
             {
+                // Uuendame lasteaia andmed otse RealEstates tabeli väljadel
+                realEstate.Address = dto.GroupName ?? "Määramata aadress";
+                realEstate.ChildrenCount = dto.ChildrenCount;
+                realEstate.KindergartenName = dto.KindergartenName ?? "Määramata lasteaed";
+                realEstate.TeacherName = dto.TeacherName ?? "Määramata õpetaja";
                 realEstate.UpdatedAt = DateTime.Now;
 
                 _context.RealEstates.Update(realEstate);

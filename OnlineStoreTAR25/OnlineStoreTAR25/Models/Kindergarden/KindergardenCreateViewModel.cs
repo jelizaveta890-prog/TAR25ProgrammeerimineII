@@ -10,5 +10,7 @@ namespace ShopTARpe25.Models.Kindergarden
 
         public string KindergartenName { get; set; }
         public string TeacherName { get; set; }
+        public List<Microsoft.AspNetCore.Http.IFormFile> Files { get; set; }
+
     }
 }

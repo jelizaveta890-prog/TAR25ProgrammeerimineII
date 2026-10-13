@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // Lisatud vajalik import ToListAsync jaoks
+using Microsoft.EntityFrameworkCore;
 using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.Serviceinterface;
@@ -9,6 +9,7 @@ using ShopTARpe25.Models.Kindergarden;
 using ShopTARpe25.Models.Spaceship;
 using System;
 using System.Threading.Tasks;
+using System.Linq; // Lisatud Select ja ToList jaoks mälu-põhiselt
 
 namespace ShopTAR25.Controllers
 {
@@ -29,20 +30,22 @@ namespace ShopTAR25.Controllers
 
         public async Task<IActionResult> Index()
         {
-          
-            var result = await _context.RealEstates
-                .Select(x => new KindergardenIndexViewModel 
-                {
-                    Id = x.Id,
-                    GroupName = x.Address, 
-                    CreatedAt = x.CreatedAt,
-                    UpdatedAt = x.UpdatedAt
-                })
-                .ToListAsync();
+            // Loeme andmed otse RealEstates tabelist
+            var realEstatesData = await _context.RealEstates.ToListAsync();
+
+            var result = realEstatesData.Select(x => new KindergardenIndexViewModel
+            {
+                Id = x.Id,
+                GroupName = x.Address, // Kasutab Address välja GroupName kuvamiseks
+                ChildrenCount = x.ChildrenCount,
+                KindergartenName = x.KindergartenName,
+                TeacherName = x.TeacherName,
+                CreatedAt = x.CreatedAt,
+                UpdatedAt = x.UpdatedAt
+            }).ToList();
 
             return View(result);
         }
-
 
         [HttpGet]
         public IActionResult Create()
@@ -55,13 +58,15 @@ namespace ShopTAR25.Controllers
         {
             var dto = new KindergardenDto
             {
-                GroupName = vm.GroupName,
+                GroupName = vm.GroupName, // Liigub teenusesse, kus määratakse Address väljale
                 ChildrenCount = vm.ChildrenCount,
                 KindergartenName = vm.KindergartenName,
                 TeacherName = vm.TeacherName,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             };
 
-            var result = await _spaceshipService.Create(dto);
+            await _spaceshipService.Create(dto);
 
             return RedirectToAction(nameof(Index));
         }
@@ -69,24 +74,22 @@ namespace ShopTAR25.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
-            // Päritakse andmed baasist (teenus otsib RealEstates tabelist)
-            var spaceship = await _spaceshipService.DetailsAsync(id);
+            var dbRealEstate = await _context.RealEstates.FirstOrDefaultAsync(x => x.Id == id);
 
-            if (spaceship == null)
+            if (dbRealEstate == null)
             {
                 return NotFound();
             }
 
-            // Kuna andmed on tegelikult RealEstates tabelis, siis loeme puuduvad andmed otse sealt,
-            // et Details vaade ei jääks tühjaks
-            var dbRealEstate = await _context.RealEstates.FirstOrDefaultAsync(x => x.Id == id);
-
             var vm = new KindergardenDetailsViewModel
             {
-                Id = spaceship.Id,
-                GroupName = dbRealEstate?.Address ?? "Määramata",
-                CreatedAt = spaceship.CreatedAt,
-                UpdatedAt = spaceship.UpdatedAt
+                Id = dbRealEstate.Id,
+                GroupName = dbRealEstate.Address,
+                ChildrenCount = dbRealEstate.ChildrenCount,
+                KindergartenName = dbRealEstate.KindergartenName,
+                TeacherName = dbRealEstate.TeacherName,
+                CreatedAt = dbRealEstate.CreatedAt,
+                UpdatedAt = dbRealEstate.UpdatedAt
             };
 
             return View(vm);
@@ -95,21 +98,22 @@ namespace ShopTAR25.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(Guid id)
         {
-            var spaceship = await _spaceshipService.DetailsAsync(id);
+            var dbRealEstate = await _context.RealEstates.FirstOrDefaultAsync(x => x.Id == id);
 
-            if (spaceship == null)
+            if (dbRealEstate == null)
             {
                 return NotFound();
             }
 
-            var dbRealEstate = await _context.RealEstates.FirstOrDefaultAsync(x => x.Id == id);
-
             var vm = new KindergardenUpdateViewModel
             {
-                Id = spaceship.Id,
-                GroupName = dbRealEstate?.Address ?? "Määramata",
-                CreatedAt = spaceship.CreatedAt,
-                UpdatedAt = spaceship.UpdatedAt
+                Id = dbRealEstate.Id,
+                GroupName = dbRealEstate.Address,
+                ChildrenCount = dbRealEstate.ChildrenCount,
+                KindergartenName = dbRealEstate.KindergartenName,
+                TeacherName = dbRealEstate.TeacherName,
+                CreatedAt = dbRealEstate.CreatedAt,
+                UpdatedAt = dbRealEstate.UpdatedAt
             };
 
             return View(vm);
@@ -122,6 +126,9 @@ namespace ShopTAR25.Controllers
             {
                 Id = vm.Id,
                 GroupName = vm.GroupName,
+                ChildrenCount = vm.ChildrenCount ?? 0,
+                KindergartenName = vm.KindergartenName,
+                TeacherName = vm.TeacherName,
                 CreatedAt = vm.CreatedAt ?? DateTime.Now,
                 UpdatedAt = DateTime.Now
             };
@@ -134,21 +141,22 @@ namespace ShopTAR25.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var spaceship = await _spaceshipService.DetailsAsync(id);
+            var dbRealEstate = await _context.RealEstates.FirstOrDefaultAsync(x => x.Id == id);
 
-            if (spaceship == null)
+            if (dbRealEstate == null)
             {
                 return NotFound();
             }
 
-            var dbRealEstate = await _context.RealEstates.FirstOrDefaultAsync(x => x.Id == id);
-
             var vm = new KindergardenDeleteViewModel
             {
-                Id = spaceship.Id,
-                GroupName = dbRealEstate?.Address ?? "Määramata",
-                CreatedAt = spaceship.CreatedAt,
-                UpdatedAt = spaceship.UpdatedAt
+                Id = dbRealEstate.Id,
+                GroupName = dbRealEstate.Address,
+                ChildrenCount = dbRealEstate.ChildrenCount,
+                KindergartenName = dbRealEstate.KindergartenName,
+                TeacherName = dbRealEstate.TeacherName,
+                CreatedAt = dbRealEstate.CreatedAt,
+                UpdatedAt = dbRealEstate.UpdatedAt
             };
 
             return View(vm);
