@@ -9,6 +9,7 @@ else
     <h1>Spaceship Create</h1>
 }
 
+
 <form method="post" enctype="multipart/form-data">
     <div>
         Spaceship Create
@@ -56,11 +57,28 @@ else
             <input asp-for="Files" class="form-control" type="file" multiple />
         </div>
     </div>
+
    
+    <div>
+        @foreach (var images in Model.Image)
+            {
+                <partial name="_Images" model="images" />
+            <input asp-action="removeImage" asp-controller="spaceship" type="submit" asp-route-imageId="@images.ImageId"
+                   class="btn btn-danger" value="Remove Image" />
+            }
+        </div>
 
+        <hr />
 
+        @if (Model.Id.HasValue)
+        {
+            <input asp-action="update" asp-controller="spaceship" type="submit" class="btn btn-primary" value="Update" />
+        }
+        else
+        {
+            <input asp-action="create" asp-controller="spaceship" type="submit" class="btn btn-primary" value="Create" />
+        }
 
-    <input asp-action="create" asp-controller="spaceship" type="submit" class="btn btn-primary" value="Create" />
     <a asp-action="Index" asp-controller="spaceship" class="btn btn-secondary">Back to List</a>
 
 </form>
