@@ -1,15 +1,19 @@
-﻿namespace ShopTARpe25.Models.Spaceship
+﻿using System.Collections.Generic; 
+using System.IO;
+
+namespace ShopTARpe25.Models.Spaceship
 {
     public class KindergardenUpdateViewModel
     {
-        public Guid Id { get; set; }
+        public System.Guid Id { get; set; }
         public string GroupName { get; set; }
         public int? ChildrenCount { get; set; }
         public string KindergartenName { get; set; } = string.Empty;
         public string TeacherName { get; set; } = string.Empty;
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public System.DateTime? CreatedAt { get; set; }
+        public System.DateTime? UpdatedAt { get; set; }
         public List<Microsoft.AspNetCore.Http.IFormFile> Files { get; set; }
 
+        public List<FileToApiViewModel> FilesToApiViewModels { get; set; } = new List<FileToApiViewModel>();
     }
 }

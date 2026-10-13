@@ -9,7 +9,8 @@ using ShopTARpe25.Models.Kindergarden;
 using ShopTARpe25.Models.Spaceship;
 using System;
 using System.Threading.Tasks;
-using System.Linq; // Lisatud Select ja ToList jaoks mälu-põhiselt
+using System.Linq;
+using System.IO; // Lisatud Path ja File käsitluseks
 
 namespace ShopTAR25.Controllers
 {
@@ -58,10 +59,11 @@ namespace ShopTAR25.Controllers
         {
             var dto = new KindergardenDto
             {
-                GroupName = vm.GroupName, // Liigub teenusesse, kus määratakse Address väljale
+                GroupName = vm.GroupName,
                 ChildrenCount = vm.ChildrenCount,
                 KindergartenName = vm.KindergartenName,
                 TeacherName = vm.TeacherName,
+                Files = vm.Files, // EDASIKANTUD: Saadab failid teenusesse salvestamiseks
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
             };
@@ -81,6 +83,16 @@ namespace ShopTAR25.Controllers
                 return NotFound();
             }
 
+            // MÄLU-PÕHINE: Laeb andmebaasist kaasa selle lasteaiaga seotud pildid
+            var images = await _context.FilesToApi
+                .Where(x => x.RealEstateId == id)
+                .Select(x => new FileToApiViewModel
+                {
+                    ImageId = x.Id,
+                    FileUrl = x.FileUrl,
+                    RealEstateId = x.RealEstateId
+                }).ToListAsync();
+
             var vm = new KindergardenDetailsViewModel
             {
                 Id = dbRealEstate.Id,
@@ -89,7 +101,8 @@ namespace ShopTAR25.Controllers
                 KindergartenName = dbRealEstate.KindergartenName,
                 TeacherName = dbRealEstate.TeacherName,
                 CreatedAt = dbRealEstate.CreatedAt,
-                UpdatedAt = dbRealEstate.UpdatedAt
+                UpdatedAt = dbRealEstate.UpdatedAt,
+                FilesToApiViewModels = images 
             };
 
             return View(vm);
@@ -105,6 +118,16 @@ namespace ShopTAR25.Controllers
                 return NotFound();
             }
 
+            // MÄLU-PÕHINE: Laeb andmebaasist kaasa pildid muutmise vaate jaoks
+            var images = await _context.FilesToApi
+                .Where(x => x.RealEstateId == id)
+                .Select(x => new FileToApiViewModel
+                {
+                    ImageId = x.Id,
+                    FileUrl = x.FileUrl,
+                    RealEstateId = x.RealEstateId
+                }).ToListAsync();
+
             var vm = new KindergardenUpdateViewModel
             {
                 Id = dbRealEstate.Id,
@@ -113,7 +136,8 @@ namespace ShopTAR25.Controllers
                 KindergartenName = dbRealEstate.KindergartenName,
                 TeacherName = dbRealEstate.TeacherName,
                 CreatedAt = dbRealEstate.CreatedAt,
-                UpdatedAt = dbRealEstate.UpdatedAt
+                UpdatedAt = dbRealEstate.UpdatedAt,
+                FilesToApiViewModels = images // LISATUD VORMISSE
             };
 
             return View(vm);
@@ -129,6 +153,7 @@ namespace ShopTAR25.Controllers
                 ChildrenCount = vm.ChildrenCount ?? 0,
                 KindergartenName = vm.KindergartenName,
                 TeacherName = vm.TeacherName,
+                Files = vm.Files, // EDASIKANTUD: Saadab uued lisatud failid teenusesse
                 CreatedAt = vm.CreatedAt ?? DateTime.Now,
                 UpdatedAt = DateTime.Now
             };
@@ -168,6 +193,31 @@ namespace ShopTAR25.Controllers
             await _spaceshipService.Delete(id);
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // UUS TEGEVUS: Pildi ükshaaval kustutamine nupu vajutusel
+        [HttpGet]
+        public async Task<IActionResult> RemoveImage(Guid imageId, Guid kindergardenId)
+        {
+            // Otsime pildi andmebaasi tabelist üles
+            var image = await _context.FilesToApi.FirstOrDefaultAsync(x => x.Id == imageId);
+
+            if (image != null)
+            {
+                // Kustutame kirje andmebaasist
+                _context.FilesToApi.Remove(image);
+                await _context.SaveChangesAsync();
+
+                // Kustutame faili füüsiliselt serveri kettalt kaustast wwwroot/images
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", image.FileUrl);
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                }
+            }
+
+            // Suuname kasutaja tagasi sama lasteaia muutmise (Update) lehele
+            return RedirectToAction(nameof(Update), new { id = kindergardenId });
         }
     }
 }
