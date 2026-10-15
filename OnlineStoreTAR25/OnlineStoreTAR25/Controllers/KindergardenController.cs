@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.IO; // Lisatud Path ja File käsitluseks
 
-namespace ShopTAR25.Controllers
+namespace ShopTARpe25.Controllers
 {
     public class KindergardenController : Controller
     {

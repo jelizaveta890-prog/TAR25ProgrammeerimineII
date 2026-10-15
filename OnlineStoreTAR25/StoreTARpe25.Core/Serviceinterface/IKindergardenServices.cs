@@ -1,5 +1,7 @@
 ﻿using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
+using System;
+using System.Threading.Tasks;
 
 namespace ShopTARpe25.Core.Serviceinterface
 {
@@ -9,9 +11,8 @@ namespace ShopTARpe25.Core.Serviceinterface
 
         Task<Kindergarden> DetailsAsync(Guid id);
 
-        Task<Kindergarden> Update(KindergardenDto id);
+        Task<Kindergarden> Update(KindergardenDto dto); 
 
         Task<Kindergarden> Delete(Guid id);
-
     }
 }
