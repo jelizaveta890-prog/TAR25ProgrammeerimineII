@@ -1,4 +1,9 @@
-﻿namespace ShopTARpe25.Models.Spaceship
+﻿using ShopTARpe25.Models.Kindergarden;
+using ShopTARpe25.Models.Spaceship;
+using System;
+using System.Collections.Generic;
+
+namespace ShopTARpe25.Models.Kindergarden
 {
     public class KindergardenDeleteViewModel
     {
@@ -9,5 +14,6 @@
         public string TeacherName { get; set; } = string.Empty;
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public List<FileToApiViewModel> FilesToApiViewModels { get; set; } = new List<FileToApiViewModel>();
     }
 }

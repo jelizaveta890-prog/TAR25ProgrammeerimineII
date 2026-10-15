@@ -11,10 +11,13 @@ namespace ShopTARpe25.ApplicationServices.Services
     public class KindergardenServices : IKindergardenServices
     {
         private readonly ShopTARpe25Context _context;
+        private readonly IFileServices _fileServices; // LISATUD: Failiteenuse muutuja
 
-        public KindergardenServices(ShopTARpe25Context context)
+        // Uuendatud konstruktor, mis võtax vastu ka failiteenuse
+        public KindergardenServices(ShopTARpe25Context context, IFileServices fileServices)
         {
             _context = context;
+            _fileServices = fileServices;
         }
 
         public async Task<Kindergarden> Create(KindergardenDto dto)
@@ -31,17 +34,30 @@ namespace ShopTARpe25.ApplicationServices.Services
                 CreatedAt = (DateTime)domain.CreatedAt,
                 UpdatedAt = (DateTime)domain.UpdatedAt,
                 Address = dto.GroupName ?? "Määramata aadress",
-
-                // Võtame andmed otse dto-st, et vältida domeenimudeli puuduvate väljade vigu
                 ChildrenCount = dto.ChildrenCount,
                 KindergartenName = dto.KindergartenName ?? "Määramata lasteaed",
                 TeacherName = dto.TeacherName ?? "Määramata õpetaja"
             };
+            // LISATUD: Перебираем все файлы циклом и сохраняем каждый отдельно
+            if (dto.Files != null)
+            {
+                foreach (var file in dto.Files)
+                {
+                    var fileDto = new FileToApiDto
+                    {
+                        File = file, // Использовано точное имя свойства: File
+                        RealEstateId = realEstateDomain.Id // Seob pildi lasteaiaga
+                    };
+                    await _fileServices.UploadFilesToApi(fileDto);
+                }
+            }
 
+
+            // LISATUD: Salvestame reaalselt andmed andmebaasi tabelisse
             await _context.RealEstates.AddAsync(realEstateDomain);
-            await _context.SaveChangesAsync(); // Salvestab andmed turvaliselt andmebaasi
+            await _context.SaveChangesAsync();
 
-            return domain;
+            return domain; // PARANDATUD: Tagastame loodud domeeniobjekti
         }
 
         public async Task<Kindergarden> DetailsAsync(Guid id)
@@ -73,6 +89,21 @@ namespace ShopTARpe25.ApplicationServices.Services
                 realEstate.KindergartenName = dto.KindergartenName ?? "Määramata lasteaed";
                 realEstate.TeacherName = dto.TeacherName ?? "Määramata õpetaja";
                 realEstate.UpdatedAt = DateTime.Now;
+                // LISATUD: Перебираем все новые файлы циклом при редактировании
+                if (dto.Files != null)
+                {
+                    foreach (var file in dto.Files)
+                    {
+                        var fileDto = new FileToApiDto
+                        {
+                            File = file, // Использовано точное имя свойства: File
+                            RealEstateId = realEstate.Id // Seob pildi lasteaiaga
+                        };
+                        await _fileServices.UploadFilesToApi(fileDto);
+                    }
+                }
+
+
 
                 _context.RealEstates.Update(realEstate);
                 await _context.SaveChangesAsync();

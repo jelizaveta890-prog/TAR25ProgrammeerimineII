@@ -102,7 +102,7 @@ namespace ShopTARpe25.Controllers
                 TeacherName = dbRealEstate.TeacherName,
                 CreatedAt = dbRealEstate.CreatedAt,
                 UpdatedAt = dbRealEstate.UpdatedAt,
-                FilesToApiViewModels = images 
+                FilesToApiViewModels = images
             };
 
             return View(vm);
@@ -173,6 +173,16 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
+            // PARANDATUD: Laeme andmebaasist kaasa pildid ka kustutamise (Delete) vaate jaoks
+            var images = await _context.FilesToApi
+                .Where(x => x.RealEstateId == id)
+                .Select(x => new FileToApiViewModel
+                {
+                    ImageId = x.Id,
+                    FileUrl = x.FileUrl,
+                    RealEstateId = x.RealEstateId
+                }).ToListAsync();
+
             var vm = new KindergardenDeleteViewModel
             {
                 Id = dbRealEstate.Id,
@@ -181,7 +191,8 @@ namespace ShopTARpe25.Controllers
                 KindergartenName = dbRealEstate.KindergartenName,
                 TeacherName = dbRealEstate.TeacherName,
                 CreatedAt = dbRealEstate.CreatedAt,
-                UpdatedAt = dbRealEstate.UpdatedAt
+                UpdatedAt = dbRealEstate.UpdatedAt,
+                FilesToApiViewModels = images 
             };
 
             return View(vm);
