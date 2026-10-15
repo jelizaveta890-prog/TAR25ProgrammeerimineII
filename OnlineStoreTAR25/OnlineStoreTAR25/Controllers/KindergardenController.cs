@@ -10,8 +10,7 @@ using ShopTARpe25.Models.Spaceship;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
-using System.IO; // Lisatud Path ja File käsitluseks
-
+using System.IO; 
 namespace ShopTARpe25.Controllers
 {
     public class KindergardenController : Controller
@@ -63,7 +62,7 @@ namespace ShopTARpe25.Controllers
                 ChildrenCount = vm.ChildrenCount,
                 KindergartenName = vm.KindergartenName,
                 TeacherName = vm.TeacherName,
-                Files = vm.Files, // EDASIKANTUD: Saadab failid teenusesse salvestamiseks
+                Files = vm.Files, //Saadab failid teenusesse salvestamiseks
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
             };
@@ -83,7 +82,7 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
-            // MÄLU-PÕHINE: Laeb andmebaasist kaasa selle lasteaiaga seotud pildid
+            // Laeb andmebaasist kaasa selle lasteaiaga seotud pildid
             var images = await _context.FilesToApi
                 .Where(x => x.RealEstateId == id)
                 .Select(x => new FileToApiViewModel
@@ -118,7 +117,7 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
-            // MÄLU-PÕHINE: Laeb andmebaasist kaasa pildid muutmise vaate jaoks
+            // Laeb andmebaasist kaasa pildid muutmise vaate jaoks
             var images = await _context.FilesToApi
                 .Where(x => x.RealEstateId == id)
                 .Select(x => new FileToApiViewModel
@@ -153,7 +152,7 @@ namespace ShopTARpe25.Controllers
                 ChildrenCount = vm.ChildrenCount ?? 0,
                 KindergartenName = vm.KindergartenName,
                 TeacherName = vm.TeacherName,
-                Files = vm.Files, // EDASIKANTUD: Saadab uued lisatud failid teenusesse
+                Files = vm.Files, // Saadab uued lisatud failid teenusesse
                 CreatedAt = vm.CreatedAt ?? DateTime.Now,
                 UpdatedAt = DateTime.Now
             };
@@ -173,7 +172,7 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
-            // PARANDATUD: Laeme andmebaasist kaasa pildid ka kustutamise (Delete) vaate jaoks
+            // Laeme andmebaasist kaasa pildid ka kustutamise (Delete) vaate jaoks
             var images = await _context.FilesToApi
                 .Where(x => x.RealEstateId == id)
                 .Select(x => new FileToApiViewModel
@@ -206,7 +205,7 @@ namespace ShopTARpe25.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // UUS TEGEVUS: Pildi ükshaaval kustutamine nupu vajutusel
+        // Pildi ükshaaval kustutamine nupu vajutusel
         [HttpGet]
         public async Task<IActionResult> RemoveImage(Guid imageId, Guid kindergardenId)
         {
