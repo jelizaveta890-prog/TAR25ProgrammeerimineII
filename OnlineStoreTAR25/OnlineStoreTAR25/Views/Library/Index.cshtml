@@ -1,0 +1,49 @@
+﻿@model IEnumerable<ShopTARpe25.Models.Library.LibraryIndexViewModel>
+
+@* Nupu tegemine *@
+<div>
+    <a asp-action="create" asp-controller="library" class="btn btn-primary"> Create </a>
+</div>
+
+<!--Main branch-->
+@* Loendi kuvamine *@
+<h2>Library Items</h2>
+
+<table class="table">
+    @* iga tulba pealkirjad *@
+    <thead>
+        <tr>
+            <th>Nr</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Built Date</th>
+            <th>Crew</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int rownumber = 1; @* id Nr'id, loendus algab ühest *@
+        }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@rownumber</td> @* järjekorranumber *@
+                <td>@item.Name</td>
+                <td>@item.Classification</td>
+                <td>@item.BuiltDate</td>
+                <td>@item.Crew</td>
+                <td>
+                    @* Nupud: details, edit, delete vvv *@
+                    <a asp-action="details" asp-controller="library" asp-route-id="@item.Id" class="btn btn-warning">Details</a>
+
+                    <a asp-action="update" asp-controller="library" asp-route-id="@item.Id" class="btn btn-primary">Update</a>
+
+                    <a asp-action="delete" asp-controller="library" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+            rownumber++;
+            @* iga uus rida on +1 id number, ehk üks arv suurem *@
+        }
+    </tbody>
+</table>

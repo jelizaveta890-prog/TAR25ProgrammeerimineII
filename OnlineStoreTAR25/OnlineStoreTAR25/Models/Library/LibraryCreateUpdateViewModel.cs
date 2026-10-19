@@ -1,6 +1,6 @@
-﻿namespace ShopTARpe25.Models.Spaceship
+﻿namespace ShopTARpe25.Models.Library
 {
-    public class SpaceshipCreateUpdateViewModel
+    public class LibraryCreateUpdateViewModel
     {
         public Guid? Id { get; set; }
         public string Name { get; set; } = string.Empty;

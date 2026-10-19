@@ -1,21 +1,18 @@
-﻿using Microsoft.AspNetCore.Http;
-
-
-namespace ShopTARpe25.Core.Dto
+﻿namespace ShopTARpe25.Models.Library
 {
-    //Dto class on selleks et vahetada andemid
-    public class SpaceshipDto
+    public class LibraryUpdateViewModel
     {
         public Guid? Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Classification { get; set; } = string.Empty;
-        public DateTime? BuildDate { get; set; }
+        public DateTime? BuiltDate { get; set; }
         public int? Crew { get; set; }
         public int? EnginePower { get; set; }
 
         public List<IFormFile> Files { get; set; }
-        public IEnumerable<FileToApiDto> FileToApiDtos { get; set; }
-             = new List<FileToApiDto>();
+        public List<ImageViewModel> Images { get; set; }
+    = new List<ImageViewModel>();
+
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }

@@ -21,7 +21,7 @@ namespace OnlineStoreTAR25
             builder.Services.AddControllersWithViews();
 
             //see on depedency injection, mis vüimaldab meil kasutada teenuseid contrillerites
-            builder.Services.AddScoped<ISpaceshipServices, SpaceshipServices>();
+            builder.Services.AddScoped<ILibraryServices, LibraryServices>();
             builder.Services.AddScoped<IFileServices, FileServices>();
 
 
