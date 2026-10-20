@@ -1,49 +1,74 @@
 ﻿@model IEnumerable<ShopTARpe25.Models.Library.LibraryIndexViewModel>
 
-@* Nupu tegemine *@
-<div>
-    <a asp-action="create" asp-controller="library" class="btn btn-primary"> Create </a>
+<div class="mb-3">
+    <!-- Nupu tegemine uue raamatu lisamiseks -->
+    <a asp-action="Create" asp-controller="Library" class="btn btn-primary">Create New Book</a>
 </div>
 
-<!--Main branch-->
-@* Loendi kuvamine *@
 <h2>Library Items</h2>
 
-<table class="table">
-    @* iga tulba pealkirjad *@
+<!-- Ülesanne 4: Otsinguvorm LINQ päringute katsetamiseks liideses -->
+<form asp-action="Index" method="get" class="row g-3 mb-4 p-3 bg-light border rounded">
+    <div class="col-md-4">
+        <label class="form-label">Otsi pealkirja järgi</label>
+        <input type="text" name="searchTitle" value="@ViewData["CurrentTitle"]" class="form-control" placeholder="Sisesta pealkiri..." />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Ilmumisaasta</label>
+        <input type="number" name="searchYear" value="@ViewData["CurrentYear"]" class="form-control" placeholder="Nt. 2026" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Saadavuse staatus</label>
+        <select name="filterStatus" class="form-select">
+            <option value="">Kõik raamatud</option>
+            <option value="Saadaval" selected="@(ViewData["CurrentStatus"]?.ToString() == "Saadaval")">Saadaval (Kohal)</option>
+            <option value="Laenutatud" selected="@(ViewData["CurrentStatus"]?.ToString() == "Laenutatud")">Laenutatud (Väljas)</option>
+        </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-secondary w-100">Filtreeri</button>
+    </div>
+</form>
+
+<table class="table table-striped table-hover">
     <thead>
         <tr>
             <th>Nr</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Built Date</th>
-            <th>Crew</th>
+            <th>Name (Title)</th>
+            <th>Classification (Author)</th>
+            <th>Built Date (Year)</th>
+            <th>Status (Crew)</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         @{
-            int rownumber = 1; @* id Nr'id, loendus algab ühest *@
+            int rownumber = 1; // Loendus algab ühest
         }
         @foreach (var item in Model)
         {
             <tr>
-                <td>@rownumber</td> @* järjekorranumber *@
+                <td>@rownumber</td>
                 <td>@item.Name</td>
                 <td>@item.Classification</td>
-                <td>@item.BuiltDate</td>
-                <td>@item.Crew</td>
+                <td>@item.BuiltDate?.Year</td>
                 <td>
-                    @* Nupud: details, edit, delete vvv *@
-                    <a asp-action="details" asp-controller="library" asp-route-id="@item.Id" class="btn btn-warning">Details</a>
-
-                    <a asp-action="update" asp-controller="library" asp-route-id="@item.Id" class="btn btn-primary">Update</a>
-
-                    <a asp-action="delete" asp-controller="library" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                    @if (item.Crew == 1)
+                    {
+                        <span class="badge bg-success">Saadaval</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Laenutatud</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Details" asp-controller="Library" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Details</a>
+                    <a asp-action="Update" asp-controller="Library" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Update</a>
+                    <a asp-action="Delete" asp-controller="Library" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
             rownumber++;
-            @* iga uus rida on +1 id number, ehk üks arv suurem *@
         }
     </tbody>
 </table>
