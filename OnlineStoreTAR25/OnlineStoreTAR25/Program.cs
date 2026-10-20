@@ -9,39 +9,38 @@ namespace OnlineStoreTAR25
     {
         public static void Main(string[] args)
         {
-
-            //Update-Database:
-            //EntityFrameworkCore\Update-Database
-
             var builder = WebApplication.CreateBuilder(args);
 
-
-
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            //see on depedency injection, mis vüimaldab meil kasutada teenuseid contrillerites
+            // dependency injection: teenused, mida kontrollerid kasutavad
             builder.Services.AddScoped<ILibraryServices, LibraryServices>();
             builder.Services.AddScoped<IFileServices, FileServices>();
+            builder.Services.AddScoped<IBookServices, BookServices>();
 
-
+            // Ühenduse seadistus: connection string on appsettings.json failis
+            // ("ConnectionStrings:DefaultConnection"), siin antakse see DbContext'ile (SQL Server / LocalDB).
             builder.Services.AddDbContext<ShopTARpe25Context>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Loob tabelid (kui neid pole) ja lisab näidisandmed, et esileht poleks tühi
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ShopTARpe25Context>();
+                db.Database.Migrate();
+                DbSeeder.Seed(db);
+            }
+
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.MapStaticAssets();

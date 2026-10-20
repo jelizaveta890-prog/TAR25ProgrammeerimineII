@@ -1,14 +1,14 @@
 ﻿@model IEnumerable<ShopTARpe25.Models.Library.LibraryIndexViewModel>
 
 <div class="mb-3">
-    <!-- Nupu tegemine uue raamatu lisamiseks -->
-    <a asp-action="Create" asp-controller="Library" class="btn btn-primary">Create New Book</a>
+    <!-- Nupp uue raamatu lisamiseks: Muudetud otseteed pidi -->
+    <a href="/Library/Create" class="btn btn-primary">Create New Book</a>
 </div>
 
 <h2>Library Items</h2>
 
-<!-- Ülesanne 4: Otsinguvorm LINQ päringute katsetamiseks liideses -->
-<form asp-action="Index" method="get" class="row g-3 mb-4 p-3 bg-light border rounded">
+<!-- Ülesanne 4: Otsinguvorm LINQ päringute katsetamiseks -->
+<form action="/Library" method="get" class="row g-3 mb-4 p-3 bg-light border rounded">
     <div class="col-md-4">
         <label class="form-label">Otsi pealkirja järgi</label>
         <input type="text" name="searchTitle" value="@ViewData["CurrentTitle"]" class="form-control" placeholder="Sisesta pealkiri..." />
@@ -43,7 +43,7 @@
     </thead>
     <tbody>
         @{
-            int rownumber = 1; // Loendus algab ühest
+            int rownumber = 1;
         }
         @foreach (var item in Model)
         {
@@ -63,9 +63,9 @@
                     }
                 </td>
                 <td>
-                    <a asp-action="Details" asp-controller="Library" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Details</a>
-                    <a asp-action="Update" asp-controller="Library" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Update</a>
-                    <a asp-action="Delete" asp-controller="Library" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                    <a href="/Library/Details/@item.Id" class="btn btn-sm btn-warning">Details</a>
+                    <a href="/Library/Update/@item.Id" class="btn btn-sm btn-primary">Update</a>
+                    <a href="/Library/Delete/@item.Id" class="btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
             rownumber++;

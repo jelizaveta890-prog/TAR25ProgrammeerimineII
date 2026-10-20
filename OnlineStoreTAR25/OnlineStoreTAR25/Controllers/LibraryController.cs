@@ -20,10 +20,8 @@ namespace ShopTARpe25.Controllers
         [HttpGet]
         public IActionResult Index(string searchTitle, int? searchYear, string filterStatus)
         {
-            // 1. Берем данные из реальной базы данных
             var booksQuery = _context.Books.AsQueryable();
 
-            // 2. Применяем фильтры LINQ, если они введены в форме
             if (!string.IsNullOrEmpty(searchTitle))
             {
                 booksQuery = booksQuery.Where(x => x.Title.Contains(searchTitle));

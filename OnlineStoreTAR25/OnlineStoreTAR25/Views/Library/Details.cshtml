@@ -1,66 +1,51 @@
 ﻿@model ShopTARpe25.Models.Library.LibraryDetailsViewModel
 
 <h1>Details</h1>
+<h3>Library Item</h3>
 
-<div>
-    <h4>Library Item</h4>
+<div class="card p-4 mt-3 col-md-6 shadow-sm">
+    <div class="row mb-2 border-bottom pb-2">
+        <div class="col-sm-4 fw-bold">ID:</div>
+        <div class="col-sm-8 text-muted">@Model.Id</div>
+    </div>
+    <div class="row mb-2 border-bottom pb-2">
+        <div class="col-sm-4 fw-bold">Book Title (Name):</div>
+        <div class="col-sm-8">@Model.Name</div>
+    </div>
+    <div class="row mb-2 border-bottom pb-2">
+        <div class="col-sm-4 fw-bold">Author (Classification):</div>
+        <div class="col-sm-8">@Model.Classification</div>
+    </div>
+    <div class="row mb-2 border-bottom pb-2">
+        <div class="col-sm-4 fw-bold">Published Year (Built Date):</div>
+        <div class="col-sm-8">@Model.BuiltDate?.Year</div>
+    </div>
+    <div class="row mb-2 border-bottom pb-2">
+        <div class="col-sm-4 fw-bold">Status (Crew):</div>
+        <div class="col-sm-8">
+            @if (Model.Crew == 1)
+            {
+                <span class="badge bg-success">Saadaval</span>
+            }
+            else
+            {
+                <span class="badge bg-danger">Laenutatud</span>
+            }
+        </div>
+    </div>
+    <div class="row mb-2 border-bottom pb-2">
+        <div class="col-sm-4 fw-bold">Created At:</div>
+        <div class="col-sm-8 text-muted">@Model.CreatedAt</div>
+    </div>
+    <div class="row mb-2 border-bottom pb-2">
+        <div class="col-sm-4 fw-bold">Modified At:</div>
+        <div class="col-sm-8 text-muted">@Model.ModifiedAt</div>
+    </div>
+    
     <hr />
-
-    <dl class="row">
-        <div class="form-group row">
-            <label asp-for="Id" class="col-sm-2 col-form-label"></label>
-            @Html.DisplayFor(Model => Model.Id)
-        </div>
-    </dl>
-
-    <dl class="row">
-        <div class="form-group row">
-            <label asp-for="Name" class="col-sm-2 col-form-label"></label>
-            @Html.DisplayFor(Model => Model.Name)
-        </div>
-    </dl>
-
-    <dl class="row">
-        <div class="form-group row">
-            <label asp-for="Classification" class="col-sm-2 col-form-label"></label>
-            @Html.DisplayFor(Model => Model.Classification)
-        </div>
-    </dl>
-
-    <dl class="row">
-        <div class="form-group row">
-            <label asp-for="BuiltDate" class="col-sm-2 col-form-label"></label>
-            @Html.DisplayFor(Model => Model.BuiltDate)
-        </div>
-    </dl>
-
-    <dl class="row">
-        <div class="form-group row">
-            <label asp-for="Crew" class="col-sm-2 col-form-label"></label>
-            @Html.DisplayFor(Model => Model.Crew)
-        </div>
-    </dl>
-
-    <dl class="row">
-        <div class="form-group row">
-            <label asp-for="EnginePower" class="col-sm-2 col-form-label"></label>
-            @Html.DisplayFor(Model => Model.EnginePower)
-        </div>
-    </dl>
-
-    <dl class="row">
-        <div class="form-group row">
-            <label asp-for="CreatedAt" class="col-sm-2 col-form-label"></label>
-            @Html.DisplayFor(Model => Model.CreatedAt)
-        </div>
-    </dl>
-
-    <dl class="row">
-        <div class="form-group row">
-            <label asp-for="ModifiedAt" class="col-sm-2 col-form-label"></label>
-            @Html.DisplayFor(Model => Model.ModifiedAt)
-        </div>
-    </dl>
-
-    <a asp-action="Index" asp-controller="library" class="btn btn-danger">Back to List</a>
+    
+    <div class="mt-3">
+        <!-- Ainult tagasitulemise nupp on alles jäetud -->
+        <a href="/Library" class="btn btn-secondary">Back to List</a>
+    </div>
 </div>
