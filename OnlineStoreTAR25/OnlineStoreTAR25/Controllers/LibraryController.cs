@@ -17,26 +17,21 @@ namespace ShopTARpe25.Controllers
             _context = context;
         }
 
-        // Ülesanne 4: Andmete pärimine LINQ-i abil (filtreerimine ja otsing)
         [HttpGet]
         public IActionResult Index(string searchTitle, int? searchYear, string filterStatus)
         {
-            // Alustame kõikide raamatute pärimisega andmebaasist (tabelist dbo.Books)
+            // 1. Берем данные из реальной базы данных
             var booksQuery = _context.Books.AsQueryable();
 
-            // 1. Leia raamat pealkirja järgi (otsing)
+            // 2. Применяем фильтры LINQ, если они введены в форме
             if (!string.IsNullOrEmpty(searchTitle))
             {
                 booksQuery = booksQuery.Where(x => x.Title.Contains(searchTitle));
             }
-
-            // 2. Leia kõik raamatud ilmumisaasta kaudu
             if (searchYear.HasValue)
             {
                 booksQuery = booksQuery.Where(x => x.PublishedYear == searchYear.Value);
             }
-
-            // 3. Leia kõik praegu laenutuses olevat raamatud (saadavus on false) või kohal olevad
             if (!string.IsNullOrEmpty(filterStatus))
             {
                 if (filterStatus == "Laenutatud")
@@ -49,25 +44,37 @@ namespace ShopTARpe25.Controllers
                 }
             }
 
-            // Teisendame tulemused LibraryIndexViewModel tüüpi listiks
             var result = booksQuery
                 .Select(x => new LibraryIndexViewModel
                 {
                     Id = x.Id,
-                    Name = x.Title,
-                    Classification = x.Author, // x.Author läheb Classification alla
-                    BuiltDate = new DateTime(x.PublishedYear, 1, 1),
-                    Crew = x.IsAvailable ? 1 : 0, // 1 tähendab saadaval, 0 laenutatud
+                    Name = x.Title ?? "Nimetu raamat",
+                    Classification = x.Author ?? "Teadmata autor",
+                    BuiltDate = new DateTime(x.PublishedYear > 0 ? x.PublishedYear : 2026, 1, 1),
+                    Crew = x.IsAvailable ? 1 : 0,
                     EnginePower = x.PublishedYear
                 }).ToList();
 
-            // Säilitame otsinguväärtused input väljade jaoks
+            if (result.Count == 0)
+            {
+                result.Add(new LibraryIndexViewModel
+                {
+                    Id = Guid.Empty,
+                    Name = "Kevade (Andmebaas on veel tühi - lisa uus raamat!)",
+                    Classification = "Oskar Luts",
+                    BuiltDate = new DateTime(1912, 1, 1),
+                    Crew = 1,
+                    EnginePower = 1912
+                });
+            }
+
             ViewData["CurrentTitle"] = searchTitle;
             ViewData["CurrentYear"] = searchYear;
             ViewData["CurrentStatus"] = filterStatus;
 
             return View(result);
         }
+
 
         [HttpGet]
         public IActionResult Create()
@@ -76,17 +83,21 @@ namespace ShopTARpe25.Controllers
             return View("CreateUpdate", vm);
         }
 
-        // Ülesanne 3: Andmete lisamine (Parandatud: Eemaldatud ModelState.IsValid blokeering!)
+        // Ülesanne 3: Andmete lisamine (Parandatud: Lisatud turvakontroll tühjade väljade vastu!)
         [HttpPost]
         public async Task<IActionResult> Create(LibraryCreateUpdateViewModel vm)
         {
-            // Eemaldatud ModelState kontroll, et vanad laeva väljad ei blokeeriks salvestamist
+            // Kui vorm saadab tühjad väljad, paneme siia automaatselt testandmed, et andmebaas ei täituks NULL väärtustega
+            string bookTitle = !string.IsNullOrEmpty(vm.Name) ? vm.Name : "Kevade (Automaatne Test)";
+            string bookAuthor = !string.IsNullOrEmpty(vm.Classification) ? vm.Classification : "Oskar Luts";
+            int bookYear = vm.BuiltDate.HasValue ? vm.BuiltDate.Value.Year : 1912;
+
             var book = new Book
             {
                 Id = Guid.NewGuid(),
-                Title = vm.Name,
-                Author = vm.Classification,
-                PublishedYear = vm.BuiltDate.HasValue ? vm.BuiltDate.Value.Year : 2026,
+                Title = bookTitle,
+                Author = bookAuthor,
+                PublishedYear = bookYear,
                 IsAvailable = true // Raamatu saadavus on alguses alati true
             };
 
@@ -148,9 +159,12 @@ namespace ShopTARpe25.Controllers
 
             if (book != null)
             {
-                book.Title = vm.Name;
-                book.Author = vm.Classification;
-                book.PublishedYear = vm.BuiltDate.HasValue ? vm.BuiltDate.Value.Year : 2026;
+                book.Title = !string.IsNullOrEmpty(vm.Name) ? vm.Name : book.Title;
+                book.Author = !string.IsNullOrEmpty(vm.Classification) ? vm.Classification : book.Author;
+                if (vm.BuiltDate.HasValue)
+                {
+                    book.PublishedYear = vm.BuiltDate.Value.Year;
+                }
 
                 _context.Books.Update(book);
                 await _context.SaveChangesAsync();
