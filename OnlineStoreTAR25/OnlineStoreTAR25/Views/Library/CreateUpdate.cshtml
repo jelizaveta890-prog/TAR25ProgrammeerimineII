@@ -11,8 +11,10 @@ else
 
 <div class="row mt-4">
     <div class="col-md-6">
+        <!-- Kuna me panime kontrollerisse täpsed [Route] reeglid, piisab vaid puhtast method="post" täägist -->
         <form method="post">
-            <!-- Peidetud väli ID jaoks, et muutmine (Update) teaks, mis raamatuga on tegu -->
+            
+            <!-- Peidetud väli ID jaoks, et muutmine teaks, mis raamatuga on tegu -->
             <input type="hidden" asp-for="Id" />
 
             <!-- 1. Raamatu Pealkiri -->
@@ -42,20 +44,21 @@ else
                 </div>
             </div>
 
-            <!-- Peidame laeva vanad väljad taustale ära, et kasutaja neid ei näeks -->
+            <!-- Peidame laeva vanad väljad taustale ära, et ühilduvus mudeliga säiliks -->
             <input type="hidden" asp-for="Crew" value="1" />
             <input type="hidden" asp-for="EnginePower" value="0" />
 
             <hr />
 
             <div class="mb-3">
+                <!-- PARANDATUD: Kasutame puhtaid ja korrektseid nuppe ilma vigaste asp-action atribuutideta! -->
                 @if (Model.Id != Guid.Empty)
                 {
-                    <input asp-action="Update" asp-controller="Library" type="submit" class="btn btn-primary" value="Update Book" />
+                    <button type="submit" class="btn btn-primary">Update Book</button>
                 }
                 else
                 {
-                    <input asp-action="Create" asp-controller="Library" type="submit" class="btn btn-primary" value="Create Book" />
+                    <button type="submit" class="btn btn-primary">Create Book</button>
                 }
                 <a href="/Library" class="btn btn-secondary ms-2">Back to List</a>
             </div>
