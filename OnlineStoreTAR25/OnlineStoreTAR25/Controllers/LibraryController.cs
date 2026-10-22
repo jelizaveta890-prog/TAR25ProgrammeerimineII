@@ -73,7 +73,6 @@ namespace ShopTARpe25.Controllers
             return View(result);
         }
 
-
         [HttpGet]
         public IActionResult Create()
         {
@@ -81,22 +80,40 @@ namespace ShopTARpe25.Controllers
             return View("CreateUpdate", vm);
         }
 
-        // Ülesanne 3: Andmete lisamine (Parandatud: Lisatud turvakontroll tühjade väljade vastu!)
+        // Ülesanne 3: Andmete lisamine – salvestatakse täpselt need andmed, mille kasutaja sisestas
         [HttpPost]
         public async Task<IActionResult> Create(LibraryCreateUpdateViewModel vm)
         {
-            // Kui vorm saadab tühjad väljad, paneme siia automaatselt testandmed, et andmebaas ei täituks NULL väärtustega
-            string bookTitle = !string.IsNullOrEmpty(vm.Name) ? vm.Name : "Kevade (Automaatne Test)";
-            string bookAuthor = !string.IsNullOrEmpty(vm.Classification) ? vm.Classification : "Oskar Luts";
-            int bookYear = vm.BuiltDate.HasValue ? vm.BuiltDate.Value.Year : 1912;
+            ModelState.Clear();
+
+            // Loeme andmed otse vormilt, kui mudeli sidumine need kätte ei saanud
+            string name = !string.IsNullOrWhiteSpace(vm.Name) ? vm.Name : Request.Form["Name"].ToString();
+            string author = !string.IsNullOrWhiteSpace(vm.Classification) ? vm.Classification : Request.Form["Classification"].ToString();
+            DateTime? date = vm.BuiltDate;
+            if (!date.HasValue && DateTime.TryParse(Request.Form["BuiltDate"], out var parsed))
+                date = parsed;
+
+            vm.Name = name;
+            vm.Classification = author;
+            vm.BuiltDate = date;
+
+            if (string.IsNullOrWhiteSpace(name))
+                ModelState.AddModelError(nameof(vm.Name), "Pealkiri on kohustuslik.");
+            if (string.IsNullOrWhiteSpace(author))
+                ModelState.AddModelError(nameof(vm.Classification), "Autor on kohustuslik.");
+            if (!date.HasValue)
+                ModelState.AddModelError(nameof(vm.BuiltDate), "Ilmumiskuupäev on kohustuslik.");
+
+            if (!ModelState.IsValid)
+                return View("CreateUpdate", vm);
 
             var book = new Book
             {
                 Id = Guid.NewGuid(),
-                Title = bookTitle,
-                Author = bookAuthor,
-                PublishedYear = bookYear,
-                IsAvailable = true // Raamatu saadavus on alguses alati true
+                Title = name.Trim(),
+                Author = author.Trim(),
+                PublishedYear = date!.Value.Year,
+                IsAvailable = true
             };
 
             _context.Books.Add(book);
@@ -149,24 +166,37 @@ namespace ShopTARpe25.Controllers
             return View("CreateUpdate", vm);
         }
 
-        // Ülesanne 5: Andmete muutmine (raamatu pealkirja jm muutmine)
+        // Ülesanne 5: Andmete muutmine
         [HttpPost]
-        public async Task<IActionResult> Update(LibraryCreateUpdateViewModel vm)
+        public async Task<IActionResult> Update(Guid id, LibraryCreateUpdateViewModel vm)
         {
-            var book = await _context.Books.FindAsync(vm.Id);
+            ModelState.Clear();
 
-            if (book != null)
+            // Id võib tulla kas aadressist (/Library/Update/{id}) või vormi peidetud väljalt
+            var bookId = vm.Id ?? id;
+
+            if (string.IsNullOrWhiteSpace(vm.Name))
+                ModelState.AddModelError(nameof(vm.Name), "Pealkiri on kohustuslik.");
+            if (string.IsNullOrWhiteSpace(vm.Classification))
+                ModelState.AddModelError(nameof(vm.Classification), "Autor on kohustuslik.");
+            if (!vm.BuiltDate.HasValue)
+                ModelState.AddModelError(nameof(vm.BuiltDate), "Ilmumiskuupäev on kohustuslik.");
+
+            if (!ModelState.IsValid)
             {
-                book.Title = !string.IsNullOrEmpty(vm.Name) ? vm.Name : book.Title;
-                book.Author = !string.IsNullOrEmpty(vm.Classification) ? vm.Classification : book.Author;
-                if (vm.BuiltDate.HasValue)
-                {
-                    book.PublishedYear = vm.BuiltDate.Value.Year;
-                }
-
-                _context.Books.Update(book);
-                await _context.SaveChangesAsync();
+                vm.Id = bookId;
+                return View("CreateUpdate", vm);
             }
+
+            var book = await _context.Books.FindAsync(bookId);
+            if (book == null)
+                return NotFound();
+
+            book.Title = vm.Name.Trim();
+            book.Author = vm.Classification.Trim();
+            book.PublishedYear = vm.BuiltDate!.Value.Year;
+
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }

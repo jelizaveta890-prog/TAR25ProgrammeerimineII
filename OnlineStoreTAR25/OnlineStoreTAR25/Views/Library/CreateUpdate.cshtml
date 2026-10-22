@@ -1,73 +1,50 @@
 ﻿@model ShopTARpe25.Models.Library.LibraryCreateUpdateViewModel
 
-@if (Model.Id != Guid.Empty)
-{
-    <h1>Library Item Update</h1>
+@{
+    bool isUpdate = Model.Id.HasValue && Model.Id.Value != Guid.Empty;
 }
-else
-{
-    <h1>Library Item Create</h1>
-}
+
+<h1>@(isUpdate ? "Library Item Update" : "Library Item Create")</h1>
 
 <div class="row mt-4">
     <div class="col-md-6">
-        <!-- Kuna me panime kontrollerisse täpsed [Route] reeglid, piisab vaid puhtast method="post" täägist -->
-        <form method="post">
-            
-            <!-- Peidetud väli ID jaoks, et muutmine teaks, mis raamatuga on tegu -->
-            <input type="hidden" asp-for="Id" />
+        <form method="post"
+              asp-controller="Library"
+              asp-action="@(isUpdate ? "Update" : "Create")"
+              asp-route-id="@(isUpdate? Model.Id: null)">
 
-            <!-- 1. Raamatu Pealkiri -->
+            <input type="hidden" name="Id" value="@(isUpdate? Model.Id.ToString() : "")" />
+
             <div class="mb-3 row">
-                <label asp-for="Name" class="col-sm-3 col-form-label fw-bold">Book Title</label>
+                <label class="col-sm-3 col-form-label fw-bold">Book Title</label>
                 <div class="col-sm-9">
-                    <input asp-for="Name" class="form-control" placeholder="Sisesta pealkiri..." required />
+                    <input type="text" name="Name" value="@Model.Name" class="form-control" placeholder="Sisesta pealkiri..." />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
             </div>
 
-            <!-- 2. Raamatu Autor -->
             <div class="mb-3 row">
-                <label asp-for="Classification" class="col-sm-3 col-form-label fw-bold">Author</label>
+                <label class="col-sm-3 col-form-label fw-bold">Author</label>
                 <div class="col-sm-9">
-                    <input asp-for="Classification" class="form-control" placeholder="Sisesta autor..." required />
+                    <input type="text" name="Classification" value="@Model.Classification" class="form-control" placeholder="Sisesta autor..." />
                     <span asp-validation-for="Classification" class="text-danger"></span>
                 </div>
             </div>
 
-            <!-- 3. Ilmumiskuupäev / aasta -->
             <div class="mb-3 row">
-                <label asp-for="BuiltDate" class="col-sm-3 col-form-label fw-bold">Published Date</label>
+                <label class="col-sm-3 col-form-label fw-bold">Published Date</label>
                 <div class="col-sm-9">
-                    <input asp-for="BuiltDate" class="form-control" type="date" required />
+                    <input type="date" name="BuiltDate" value="@(Model.BuiltDate?.ToString("yyyy-MM-dd"))" class="form-control" />
                     <span asp-validation-for="BuiltDate" class="text-danger"></span>
                 </div>
             </div>
 
-            <!-- Peidame laeva vanad väljad taustale ära, et ühilduvus mudeliga säiliks -->
-            <input type="hidden" asp-for="Crew" value="1" />
-            <input type="hidden" asp-for="EnginePower" value="0" />
-
             <hr />
 
             <div class="mb-3">
-                <!-- PARANDATUD: Kasutame puhtaid ja korrektseid nuppe ilma vigaste asp-action atribuutideta! -->
-                @if (Model.Id != Guid.Empty)
-                {
-                    <button type="submit" class="btn btn-primary">Update Book</button>
-                }
-                else
-                {
-                    <button type="submit" class="btn btn-primary">Create Book</button>
-                }
+                <button type="submit" class="btn btn-primary">@(isUpdate ? "Update Book" : "Create Book")</button>
                 <a href="/Library" class="btn btn-secondary ms-2">Back to List</a>
             </div>
         </form>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
