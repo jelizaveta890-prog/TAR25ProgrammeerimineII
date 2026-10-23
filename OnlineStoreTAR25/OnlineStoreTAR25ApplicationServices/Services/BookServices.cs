@@ -59,6 +59,20 @@ namespace ShopTARpe25.ApplicationServices.Services
         public Task<List<Reader>> GetReadersAsync() =>
             _context.Readers.AsNoTracking().OrderBy(r => r.FullName).ToListAsync();
 
+        // Ülesanne 5: lugejate lisamine
+        public async Task<Reader> AddReaderAsync(string fullName, string email)
+        {
+            var reader = new Reader
+            {
+                Id = Guid.NewGuid(),
+                FullName = fullName.Trim(),
+                Email = email.Trim()
+            };
+            _context.Readers.Add(reader);
+            await _context.SaveChangesAsync();
+            return reader;
+        }
+
         // Ülesanne 5: muutmine ja kustutamine
         public async Task<bool> UpdateTitleAsync(Guid id, string newTitle)
         {

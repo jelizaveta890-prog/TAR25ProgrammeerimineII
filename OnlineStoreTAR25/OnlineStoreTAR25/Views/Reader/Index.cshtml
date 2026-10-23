@@ -1,0 +1,42 @@
+﻿@model List<Reader>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<h1>Lugejad</h1>
+
+<form action="/Reader/Create" method="post" class="row g-3 mb-4 p-3 bg-light border rounded">
+    <div class="col-md-4">
+        <label class="form-label">Täisnimi</label>
+        <input type="text" name="fullName" class="form-control" required />
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">E-post</label>
+        <input type="email" name="email" class="form-control" required />
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Lisa lugeja</button>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr><th>Nimi</th><th>E-post</th><th></th></tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.FullName</td>
+                <td>@r.Email</td>
+                <td><a href="/Reader/Loans/@r.Id" class="btn btn-sm btn-warning">Laenutused</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

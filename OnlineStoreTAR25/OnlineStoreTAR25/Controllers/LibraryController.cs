@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
 using ShopTARpe25.Models.Library;
 using System;
@@ -11,10 +12,12 @@ namespace ShopTARpe25.Controllers
     public class LibraryController : Controller
     {
         private readonly ShopTARpe25Context _context;
+        private readonly IBookServices _bookServices;
 
-        public LibraryController(ShopTARpe25Context context)
+        public LibraryController(ShopTARpe25Context context, IBookServices bookServices)
         {
             _context = context;
+            _bookServices = bookServices;
         }
 
         [HttpGet]
@@ -80,13 +83,12 @@ namespace ShopTARpe25.Controllers
             return View("CreateUpdate", vm);
         }
 
-        // Ülesanne 3: Andmete lisamine – salvestatakse täpselt need andmed, mille kasutaja sisestas
+        // Ülesanne 3: Andmete lisamine
         [HttpPost]
         public async Task<IActionResult> Create(LibraryCreateUpdateViewModel vm)
         {
             ModelState.Clear();
 
-            // Loeme andmed otse vormilt, kui mudeli sidumine need kätte ei saanud
             string name = !string.IsNullOrWhiteSpace(vm.Name) ? vm.Name : Request.Form["Name"].ToString();
             string author = !string.IsNullOrWhiteSpace(vm.Classification) ? vm.Classification : Request.Form["Classification"].ToString();
             DateTime? date = vm.BuiltDate;
@@ -107,17 +109,7 @@ namespace ShopTARpe25.Controllers
             if (!ModelState.IsValid)
                 return View("CreateUpdate", vm);
 
-            var book = new Book
-            {
-                Id = Guid.NewGuid(),
-                Title = name.Trim(),
-                Author = author.Trim(),
-                PublishedYear = date!.Value.Year,
-                IsAvailable = true
-            };
-
-            _context.Books.Add(book);
-            await _context.SaveChangesAsync();
+            await _bookServices.AddBookAsync(name, author, date!.Value.Year);
 
             return RedirectToAction(nameof(Index));
         }
@@ -172,7 +164,6 @@ namespace ShopTARpe25.Controllers
         {
             ModelState.Clear();
 
-            // Id võib tulla kas aadressist (/Library/Update/{id}) või vormi peidetud väljalt
             var bookId = vm.Id ?? id;
 
             if (string.IsNullOrWhiteSpace(vm.Name))
@@ -223,17 +214,60 @@ namespace ShopTARpe25.Controllers
             return View(vm);
         }
 
-        // Ülesanne 5: Kustutamine andmebaasist
+        // Ülesanne 5: Kustutamine (laenutatud raamatut ei kustutata)
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmation(Guid id)
         {
-            var book = await _context.Books.FindAsync(id);
+            var result = await _bookServices.DeleteBookAsync(id);
 
-            if (book != null)
+            if (result == DeleteBookResult.NotFound)
+                return NotFound();
+
+            if (result == DeleteBookResult.HasActiveLoan)
+                TempData["Error"] = "Raamatut ei saa kustutada, sest see on laenutatud. Tagasta raamat enne.";
+            else
+                TempData["Success"] = "Raamat kustutati.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Laenutamise vorm: valime lugeja
+        [HttpGet]
+        public async Task<IActionResult> LoanBook(Guid id)
+        {
+            var book = await _bookServices.GetByIdAsync(id);
+            if (book == null) return NotFound();
+
+            if (!book.IsAvailable)
             {
-                _context.Books.Remove(book);
-                await _context.SaveChangesAsync();
+                TempData["Error"] = "See raamat on juba laenutatud.";
+                return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.BookId = book.Id;
+            ViewBag.BookTitle = book.Title;
+            ViewBag.Readers = await _bookServices.GetReadersAsync();
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> LoanBook(Guid id, Guid readerId)
+        {
+            var ok = await _bookServices.LoanBookAsync(id, readerId);
+
+            if (ok) TempData["Success"] = "Raamat laenutatud.";
+            else TempData["Error"] = "Laenutamine ebaõnnestus (raamat pole saadaval või lugejat ei leitud).";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReturnBook(Guid id)
+        {
+            var ok = await _bookServices.ReturnBookAsync(id);
+
+            if (ok) TempData["Success"] = "Raamat tagastatud, tagastamise kuupäev salvestatud.";
+            else TempData["Error"] = "Tagastamine ebaõnnestus (aktiivset laenutust ei leitud).";
 
             return RedirectToAction(nameof(Index));
         }

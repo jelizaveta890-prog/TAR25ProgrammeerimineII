@@ -1,13 +1,20 @@
 ﻿@model IEnumerable<ShopTARpe25.Models.Library.LibraryIndexViewModel>
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
 <div class="mb-3">
-    <!-- Nupp uue raamatu lisamiseks: Muudetud otseteed pidi -->
     <a href="/Library/Create" class="btn btn-primary">Create New Book</a>
 </div>
 
 <h2>Library Items</h2>
 
-<!-- Ülesanne 4: Otsinguvorm LINQ päringute katsetamiseks -->
 <form action="/Library" method="get" class="row g-3 mb-4 p-3 bg-light border rounded">
     <div class="col-md-4">
         <label class="form-label">Otsi pealkirja järgi</label>
@@ -66,6 +73,20 @@
                     <a href="/Library/Details/@item.Id" class="btn btn-sm btn-warning">Details</a>
                     <a href="/Library/Update/@item.Id" class="btn btn-sm btn-primary">Update</a>
                     <a href="/Library/Delete/@item.Id" class="btn btn-sm btn-danger">Delete</a>
+
+                    @if (item.Id != Guid.Empty)
+                    {
+                        if (item.Crew == 1)
+                        {
+                            <a href="/Library/LoanBook/@item.Id" class="btn btn-sm btn-success">Laenuta</a>
+                        }
+                        else
+                        {
+                            <form action="/Library/ReturnBook/@item.Id" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-info">Tagasta</button>
+                            </form>
+                        }
+                    }
                 </td>
             </tr>
             rownumber++;

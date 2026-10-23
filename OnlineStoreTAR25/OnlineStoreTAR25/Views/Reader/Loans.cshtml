@@ -1,0 +1,29 @@
+﻿@model List<Loan>
+
+<h1>Laenutused: @ViewBag.ReaderName</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr><th>Raamat</th><th>Laenutatud</th><th>Tagastatud</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var l in Model)
+        {
+            <tr>
+                <td>@l.Book.Title</td>
+                <td>@l.LoanDate.ToString("dd.MM.yyyy")</td>
+                <td>
+                    @if (l.ReturnDate.HasValue)
+                    {
+                        @l.ReturnDate.Value.ToString("dd.MM.yyyy")
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Laenutatud</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a href="/Reader" class="btn btn-secondary">Tagasi</a>

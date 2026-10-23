@@ -13,6 +13,7 @@
         Task<List<Loan>> GetLoansByReaderAsync(Guid readerId);
         Task<List<Loan>> GetLoansByBookAsync(Guid bookId);
         Task<List<Reader>> GetReadersAsync();
+        Task<Reader> AddReaderAsync(string fullName, string email);
         Task<bool> UpdateTitleAsync(Guid id, string newTitle);
         Task<bool> ReturnBookAsync(Guid bookId);
         Task<DeleteBookResult> DeleteBookAsync(Guid id);

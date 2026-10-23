@@ -1,0 +1,16 @@
+﻿<h1>Laenuta raamat</h1>
+<p>Raamat: <strong>@ViewBag.BookTitle</strong></p>
+
+<form action="/Library/LoanBook/@ViewBag.BookId" method="post" class="col-md-5">
+    <div class="mb-3">
+        <label class="form-label">Vali lugeja</label>
+        <select name="readerId" class="form-select" required>
+            @foreach (var r in (List<Reader>)ViewBag.Readers)
+            {
+                <option value="@r.Id">@r.FullName (@r.Email)</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Laenuta</button>
+    <a href="/Library" class="btn btn-secondary ms-2">Tühista</a>
+</form>
