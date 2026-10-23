@@ -91,5 +91,17 @@
             </tr>
             rownumber++;
         }
+
+        @if (!Model.Any())
+        {
+            if ((bool)(ViewData["DbEmpty"] ?? false))
+            {
+                <div class="alert alert-info">Andmebaas on veel tühi - lisa uus raamat!</div>
+            }
+            else
+            {
+                <div class="alert alert-warning">Otsingule ei leitud ühtegi raamatut.</div>
+            }
+        }
     </tbody>
 </table>

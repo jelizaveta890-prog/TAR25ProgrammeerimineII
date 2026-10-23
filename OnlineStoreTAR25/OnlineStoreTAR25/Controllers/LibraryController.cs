@@ -56,18 +56,7 @@ namespace ShopTARpe25.Controllers
                     EnginePower = x.PublishedYear
                 }).ToList();
 
-            if (result.Count == 0)
-            {
-                result.Add(new LibraryIndexViewModel
-                {
-                    Id = Guid.Empty,
-                    Name = "Kevade (Andmebaas on veel tühi - lisa uus raamat!)",
-                    Classification = "Oskar Luts",
-                    BuiltDate = new DateTime(1912, 1, 1),
-                    Crew = 1,
-                    EnginePower = 1912
-                });
-            }
+            ViewData["DbEmpty"] = !_context.Books.Any();
 
             ViewData["CurrentTitle"] = searchTitle;
             ViewData["CurrentYear"] = searchYear;
