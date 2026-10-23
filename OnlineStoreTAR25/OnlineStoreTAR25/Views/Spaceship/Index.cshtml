@@ -1,47 +1,51 @@
 ﻿@model IEnumerable<ShopTARpe25.Models.Spaceship.SpaceshipIndexViewModel>
 
-@* Nupu tegemine *@
-<div>
-    <a asp-action="create" asp-controller="Spaceship" class="btn btn-primary"> Create </a>
+@* Pealkiri ja "Create" nupp *@
+<div class="page-header">
+    <h2>Spaceships</h2>
+    <a asp-action="Create" class="btn btn-primary">+ New spaceship</a>
 </div>
 
-<!--Main branch-->
-
-@* Loendi kuvamine *@
-<h2>Spaceships</h2>
-
-<table class="table"> @* iga tulba pealkirjad *@
-    <thead>
-        <tr>
-            <th>Nr</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Built Date</th>
-            <th>Crew</th>
-        </tr>
-    </thead>
-    <tbody>
-        @{
-            int rownumber = 1; @* id Nr'id, loendus algab ühest *@
-        }
-        @foreach (var ship in Model)
-        {
+@* Loendi kuvamine kaardi sees *@
+<div class="card-soft p-0 overflow-hidden">
+    <table class="table table-modern">
+        <thead>
             <tr>
-                <td>@rownumber</td> @* järjekorranumber *@
-                <td>@ship.Name</td>
-                <td>@ship.Classification</td>
-                <td>@ship.BuiltDate</td>
-                <td>@ship.Crew</td>
-                <td>
-                    @* Nupud: details, edit, delete vvv *@
-                    <a asp-action="details"asp-route-id="@ship.Id" class="btn btn-warning">Details  </a>
-
-                    <a asp-action="update"asp-route-id="@ship.Id" class="btn btn-primary">Update </a>
-
-                    <a asp-action="delete"asp-route-id="@ship.Id"class="btn btn-danger">Delete </a>
-                </td>
+                <th class="ps-4">Nr</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Built Date</th>
+                <th>Crew</th>
+                <th></th>
             </tr>
-            rownumber++; @* iga uus rida on +1 id number, ehk üks arv suurem *@
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @{
+                int rownumber = 1; @* loendus algab ühest *@
+            }
+            @foreach (var ship in Model)
+            {
+                <tr>
+                    <td class="ps-4 text-muted">@rownumber</td>
+                    <td class="fw-semibold">@ship.Name</td>
+                    <td><span class="badge rounded-pill text-bg-light border">@ship.Classification</span></td>
+                    <td>@ship.BuiltDate?.ToString("dd.MM.yyyy")</td>
+                    <td>@ship.Crew</td>
+                    <td class="text-end pe-4">
+                        @* Nupud: details, update, delete *@
+                        <a asp-action="Details" asp-route-id="@ship.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                        <a asp-action="Update" asp-route-id="@ship.Id" class="btn btn-sm btn-outline-primary">Update</a>
+                        <a asp-action="Delete" asp-route-id="@ship.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+                rownumber++;
+                @* iga uus rida on üks number suurem *@
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Any())
+    {
+        <p class="text-center text-muted py-5 mb-0">No spaceships yet. Create the first one!</p>
+    }
+</div>
