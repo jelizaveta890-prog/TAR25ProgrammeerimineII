@@ -5,4 +5,124 @@ ViewData["Title"] = "Home Page";
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    @{
+        ViewData["Title"] = "Home Page";
+    }
+
+    @{
+        ViewData["Title"] = "Home Page";
+    }
+    
+        <!-- INTERAKTIIVNE TORDI DISAINIMISE MÄNG -->
+        <div class="card mt-5 p-4" style="background: rgba(255, 255, 255, 0.95) !important; border: 2px solid #fbcfe8 !important; border-radius: 24px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important; max-width: 600px; margin: 0 auto; text-align: left;">
+        
+            <h3 class="text-center" style="color: #4c1d95; font-weight: 800; margin-bottom: 20px;">🎂 Jelizaveta Tordistuudio</h3>
+        
+            <!-- SAMM 1: VALIKUPANEELID -->
+            <div class="row g-3 mb-4">
+                <!-- Kuju valik -->
+                <div class="col-6">
+                    <label class="form-label font-weight-bold" style="color: #6d28d9; font-weight: 600;">1. Vali tordi kuju:</label>
+                    <select id="shapeSelect" class="form-select" style="border-radius: 10px !important;">
+                        <option value="6px">Kandiline klassika</option>
+                        <option value="50px">Ümmargune biskviit</option>
+                        <option value="50% 50% 0 0">Südamekujuline vundament</option>
+                    </select>
+                </div>
+            
+                <!-- Glasuuri valik -->
+                <div class="col-6">
+                    <label class="form-label font-weight-bold" style="color: #6d28d9; font-weight: 600;">2. Vali glasuuri maitse:</label>
+                    <select id="glazeSelect" class="form-select" style="border-radius: 10px !important;">
+                        <option value="#f472b6">🍓 Roosa maasikas</option>
+                        <option value="#78350f">🍫 Pruun šokolaad</option>
+                        <option value="#a7f3d0">🍏 Roheline pistaatsia</option>
+                        <option value="#c084fc">🍇 Lilla mustikas</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- TEGEVUSNUPUD -->
+            <div class="row g-2 mb-4">
+                <div class="col-8">
+                    <button id="addLayerBtn" class="btn btn-primary w-100" style="background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%) !important; border: none !important; border-radius: 12px !important; font-weight: 700; padding: 12px;">🥞 Lisa uus kiht!</button>
+                </div>
+                <div class="col-4">
+                    <button id="clearCakeBtn" class="btn btn-outline-danger w-100" style="border-radius: 12px !important; font-weight: 600; padding: 12px;">Prügikast</button>
+                </div>
+            </div>
+
+            <!-- MÄNGUVÄLJAK / KÖÖK -->
+            <div id="kitchenArea" style="width: 100%; height: 350px; background: linear-gradient(#fdf2f8, #f5f3ff); border-radius: 16px; position: relative; overflow: hidden; border: 2px dashed #fbcfe8; display: flex; flex-direction: column-reverse; align-items: center; padding-bottom: 20px;">
+                <!-- Tordi alustaldrik -->
+                <div id="cakePlate" style="width: 240px; height: 15px; background: #e2e8f0; border-radius: 50px; border-bottom: 4px solid #cbd5e1; z-index: 1; margin-bottom: -5px;"></div>
+            </div>
+        
+            <div class="text-center mt-3 text-muted small">Ehitajad saavad teha kuni 10-korruselise unistuste tordi!</div>
+        </div>
+    </div>
+
+    <!-- MÄNGU JUHTIMISE SKRIPT -->
+    <script>
+            const shapeSelect = document.getElementById('shapeSelect');
+            const glazeSelect = document.getElementById('glazeSelect');
+            const addLayerBtn = document.getElementById('addLayerBtn');
+            const clearCakeBtn = document.getElementById('clearCakeBtn');
+            const kitchenArea = document.getElementById('kitchenArea');
+
+            let layerCount = 0;
+            const maxLayers = 10;
+
+            // UUE KIHI LISAMINE
+            addLayerBtn.addEventListener('click', () => {
+                if (layerCount >= maxLayers) {
+                    alert("Sinu tort on juba hiiglaslik! Rohkem kihte taldrikule ei mahu. 🎂");
+                    return;
+                }
+
+                layerCount++;
+
+                // Luuakse uus biskviidi/glasuuri element
+                const layer = document.createElement('div');
+        
+                // Võetakse kasutaja valitud kuju ja värv
+                const selectedShape = shapeSelect.value;
+                const selectedColor = glazeSelect.value;
+
+                // Arvutatakse kihi laius (mida kõrgem rida, seda kitsam, et tekiks püramiidi efekt)
+                const startingWidth = 200;
+                const currentWidth = startingWidth - (layerCount * 14);
+
+                // Stiilitakse torditükk
+                layer.className = 'custom-cake-layer';
+                layer.style.width = currentWidth + 'px';
+                layer.style.height = '24px';
+                layer.style.backgroundColor = selectedColor;
+                layer.style.borderRadius = selectedShape;
+                layer.style.marginBottom = '2px';
+                layer.style.borderBottom = '4px solid rgba(0, 0, 0, 0.15)';
+                layer.style.boxShadow = '0 4px 6px rgba(0,0,0,0.05)';
+                layer.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                layer.style.zIndex = layerCount + 1;
+        
+                // Efekt: kiht kergelt kukub ülevalt kohale
+                layer.style.transform = 'scale(0)';
+        
+                // Lisatakse taldriku kohale
+                kitchenArea.insertBefore(layer, kitchenArea.firstChild);
+        
+                // Käivitatakse ilmumise animatsioon
+                setTimeout(() => {
+                    layer.style.transform = 'scale(1)';
+                }, 10);
+            });
+
+            // TORDI KUSTUTAMINE
+            clearCakeBtn.addEventListener('click', () => {
+                const layers = kitchenArea.querySelectorAll('.custom-cake-layer');
+                layers.forEach(l => l.remove());
+                layerCount = 0;
+            });
+    </script>
+
 </div>
