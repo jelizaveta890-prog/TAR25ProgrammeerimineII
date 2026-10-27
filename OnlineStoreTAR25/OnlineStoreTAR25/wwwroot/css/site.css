@@ -1,6 +1,3 @@
-/* ==========================================================================
-   1. ANIMATIONS & DYNAMIC PASTEL BACKGROUND
-   ========================================================================== */
 @keyframes fluidGradient {
     0% {
         background-position: 0% 50%;
@@ -30,7 +27,6 @@ html {
 body {
     margin-bottom: 60px;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    /* Elav ja liikuv pastelse gradient-taust */
     background: linear-gradient(-45deg, #e0f2fe, #fdf2f8, #f5f3ff, #fef08a) !important;
     background-size: 400% 400% !important;
     animation: fluidGradient 15s ease infinite !important;
@@ -38,9 +34,6 @@ body {
     color: #1e293b !important;
 }
 
-/* ==========================================================================
-   2. INTERACTIVE NAVBAR (HELEKUMAV KLAASIEFENT)
-   ========================================================================== */
 .navbar, nav {
     background: rgba(255, 255, 255, 0.7) !important;
     backdrop-filter: blur(12px) !important;
@@ -49,9 +42,6 @@ body {
     transition: all 0.3s ease;
 }
 
-/* ==========================================================================
-   3. 3D HOVER CARD (MÄNGI JA LIIGUTA HIIRT PEAL!)
-   ========================================================================== */
 .card, .border, [class*="filter"] {
     background: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(8px) !important;
@@ -59,7 +49,6 @@ body {
     border-radius: 24px !important;
     padding: 28px !important;
     box-shadow: 0 10px 30px rgba(168, 85, 247, 0.05) !important;
-    /* 3D efekti ettevalmistus */
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
     transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
 }
@@ -71,9 +60,6 @@ body {
         border-color: #fbcfe8 !important; /* Muutub õrnalt roosaks */
     }
 
-/* ==========================================================================
-   4. GLOWING FORM INPUTS
-   ========================================================================== */
 .form-control, .form-select {
     border: 2px solid #cbd5e1 !important;
     border-radius: 12px !important;
@@ -89,10 +75,6 @@ body {
         transform: scale(1.02);
     }
 
-/* ==========================================================================
-   5. POPPING BUTTONS & BADGES
-   ========================================================================== */
-/* Pea-nupud (Create New jne) */
 .btn-primary, [class*="btn-create"] {
     background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%) !important;
     border: none !important;
@@ -108,7 +90,6 @@ body {
         box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3) !important;
     }
 
-/* Tabeli tegevusnupud - pop-out efektiga */
 .table .btn {
     border-radius: 10px !important;
     font-weight: 600 !important;
@@ -140,13 +121,11 @@ body {
     color: white !important;
 }
 
-/* ==========================================================================
-   6. LIIKUVATE RIDADGA TABEL
-   ========================================================================== */
+
 .table {
     background: rgba(255, 255, 255, 0.9) !important;
     border-collapse: separate !important;
-    border-spacing: 0 8px !important; /* Teeb read üksteisest eraldatuks */
+    border-spacing: 0 8px !important; 
     border-radius: 20px !important;
     padding: 10px !important;
     border: none !important;
@@ -162,7 +141,6 @@ body {
         padding: 16px !important;
     }
 
-    /* Iga rida käitub nagu eraldi hõljuv saareke */
     .table tr td {
         background-color: #ffffff !important;
         padding: 18px !important;
@@ -170,7 +148,6 @@ body {
         border: none !important;
     }
 
-        /* Teeb reatabeli nurgaääred ümaraks */
         .table tr td:first-child {
             border-radius: 14px 0 0 14px !important;
         }
@@ -179,9 +156,8 @@ body {
             border-radius: 0 14px 14px 0 !important;
         }
 
-    /* MÄNGUEFEKT: Kui liigud hiirega üle rea, värvub see pehmelt ümber */
     .table tbody tr:hover td {
-        background-color: #fef08a !important; /* Mahe pastelkollane esiletõst */
+        background-color: #fef08a !important; 
         color: #4c1d95 !important;
         transform: scale(1.005);
         cursor: pointer;
