@@ -22,6 +22,7 @@ namespace OnlineStoreTAR25
 
             //see on depedency injection, mis vüimaldab meil kasutada teenuseid contrillerites
             builder.Services.AddScoped<ISpaceshipServices, SpaceshipServices>();
+            builder.Services.AddScoped<IRealEstateServices, RealEstateServices>();
             builder.Services.AddScoped<IFileServices, FileServices>();
 
 
