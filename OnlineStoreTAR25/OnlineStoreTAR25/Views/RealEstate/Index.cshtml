@@ -25,10 +25,10 @@
             {
                 <tr>
                     <td class="ps-4 text-muted">@rownumber</td>
-                    <td class="fw-semibold">@item.Address</td>
+                    <td>@item.Address</td>
                     <td>@item.Area</td>
                     <td>@item.RoomNumber</td>
-                    <td><span class="badge rounded-pill text-bg-light border">@item.BuildingType</span></td>
+                    <td>@item.BuildingType</td>
                     <td class="text-end pe-4">
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Details</a>
                         <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Update</a>

@@ -14,6 +14,10 @@
         <dd class="col-sm-9">@Model.RoomNumber</dd>
         <dt class="col-sm-3">Building type</dt>
         <dd class="col-sm-9">@Model.BuildingType</dd>
+        <dt class="col-sm-3">CreatedAt</dt>
+        <dd class="col-sm-9">@Model.CreatedAt?.ToString("dd.MM.yyyy HH:mm")</dd>
+        <dt class="col-sm-3">ModifiedAt</dt>
+        <dd class="col-sm-9">@Model.ModifiedAt?.ToString("dd.MM.yyyy HH:mm")</dd>
     </dl>
 
     <form asp-action="DeleteConfirmation" class="mt-4 d-flex gap-2">
