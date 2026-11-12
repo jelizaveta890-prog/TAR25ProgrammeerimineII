@@ -145,6 +145,5 @@ namespace ShopTARpe25.ApplicationServices.Services
                 }
             }
         }
-
     }
 }

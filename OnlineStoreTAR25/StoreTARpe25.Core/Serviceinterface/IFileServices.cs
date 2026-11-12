@@ -8,5 +8,7 @@ namespace ShopTARpe25.Core.ServiceInterface
         void FilesToApi(SpaceshipDto dto, Spaceship domain);
         Task<FileToApi> RemoveImageFromApi(FileToApiDto dto);
         Task<List<FileToApi>> RemoveImagesFromApi(FileToApiDto[] dto);
+        void UploadFilesToDatabase(RealEstateDto dto, RealEstate domain);
+
     }
 }
