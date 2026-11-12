@@ -39,6 +39,26 @@ namespace ShopTARpe25.Data.Migrations
                     b.ToTable("FileToApis");
                 });
 
+            modelBuilder.Entity("ShopTARpe25.Core.Domain.FileToDatabase", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("ImageDate")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ImageTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("RealEstatedId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FileToDatabases");
+                });
+
             modelBuilder.Entity("ShopTARpe25.Core.Domain.RealEstate", b =>
                 {
                     b.Property<Guid>("Id")
