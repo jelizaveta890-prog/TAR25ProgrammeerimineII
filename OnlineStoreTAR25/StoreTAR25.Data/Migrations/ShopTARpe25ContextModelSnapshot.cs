@@ -45,13 +45,13 @@ namespace ShopTARpe25.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<byte[]>("ImageDate")
+                    b.Property<byte[]>("ImageData")
                         .HasColumnType("varbinary(max)");
 
                     b.Property<string>("ImageTitle")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("RealEstatedId")
+                    b.Property<Guid?>("RealEstateId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
