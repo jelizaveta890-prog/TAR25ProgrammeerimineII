@@ -43,37 +43,46 @@ namespace ShopTARpe25.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            RealEstateCreateUpdateViewModel vm = new();
+            RealEstateCreateUpdateViewModel result = new();
 
-            return View("CreateUpdate", vm);
+            return View("CreateUpdate", result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(RealEstateCreateUpdateViewModel vm)
+        public async Task<IActionResult> Create(RealEstateCreateUpdateViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View("CreateUpdate", model);
+            }
+
             var dto = new RealEstateDto()
             {
-                Area = vm.Area,
-                Address = vm.Address,
-                RoomNumber = vm.RoomNumber,
-                BuildingType = vm.BuildingType,
-                Files = vm.Files,
-                Image = vm.Image
-                .Select(x => new FileToDatabaseDto
-                {
-                    Id = x.ImageId,
-                    ImageData = x.ImageData,
-                    ImageTitle = x.ImageTitle,
-                    RealEstateId = x.RealEstateId
-
-                }).ToArray()
+                Area = model.Area,
+                Address = model.Address,
+                RoomNumber = model.RoomNumber,
+                BuildingType = model.BuildingType,
+                Files = model.Files,
+                Image = model.Image
+                    .Select(x => new FileToDatabaseDto
+                    {
+                        Id = x.ImageId,
+                        ImageData = x.ImageData,
+                        ImageTitle = x.ImageTitle,
+                        RealEstateId = x.RealEstateId
+                    }).ToArray()
             };
 
-            await _realEstateServices.Create(dto);
+            var result = await _realEstateServices.Create(dto);
+
+            if (result == null)
+            {
+                ModelState.AddModelError("", "Real estate creation failed.");
+                return View(nameof(Index));
+            }
 
             return RedirectToAction(nameof(Index));
         }
-
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
@@ -95,6 +104,7 @@ namespace ShopTARpe25.Controllers
             vm.BuildingType = realEstate.BuildingType;
             vm.CreatedAt = realEstate.CreatedAt;
             vm.ModifiedAt = realEstate.ModifiedAt;
+            vm.Images.AddRange(images);
 
             return View(vm);
         }
@@ -180,6 +190,7 @@ namespace ShopTARpe25.Controllers
                     RealEstateId = y.RealEstateId,
                     ImageData = y.ImageData,
                     ImageTitle = y.ImageTitle,
+                    //string.Format tähendab e see muudab andmed string andmetüübiks
                     Image = string.Format("data:image/gif;base64,{0}",Convert.ToBase64String(y.ImageData))
                 }).ToArrayAsync();
 
