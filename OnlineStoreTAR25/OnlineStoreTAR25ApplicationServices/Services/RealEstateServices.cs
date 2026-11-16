@@ -60,17 +60,25 @@ namespace ShopTARpe25.ApplicationServices.Services
 
         public async Task<RealEstate> Update(RealEstateDto dto)
         {
-            RealEstate domain = new();
+            var domain = await _context.RealEstates
+                .FirstOrDefaultAsync(x => x.Id == dto.Id);
 
-            domain.Id = dto.Id;
+            if (domain == null)
+            {
+                return null;
+            }
+
             domain.Area = dto.Area;
             domain.Address = dto.Address;
             domain.RoomNumber = dto.RoomNumber;
             domain.BuildingType = dto.BuildingType;
-            domain.CreatedAt = dto.CreatedAt;
             domain.ModifiedAt = DateTime.Now;
 
-            _context.RealEstates.Update(domain);
+            if (dto.Files != null && dto.Files.Count > 0)
+            {
+                _fileServices.UploadFilesToDatabase(dto, domain);
+            }
+
             await _context.SaveChangesAsync();
 
             return domain;
