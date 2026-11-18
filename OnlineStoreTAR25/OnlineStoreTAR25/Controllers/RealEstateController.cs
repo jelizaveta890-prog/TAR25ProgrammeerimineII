@@ -61,7 +61,16 @@ namespace ShopTARpe25.Controllers
                 Address = vm.Address,
                 RoomNumber = vm.RoomNumber,
                 BuildingType = vm.BuildingType,
-                Files = vm.Files ?? new List<IFormFile>()
+                Files = vm.Files,
+                Image = vm.Image
+               .Select(x => new FileToDatabaseDto
+               {
+                   Id = x.ImageId,
+                   ImageData = x.ImageData,
+                   ImageTitle = x.ImageTitle,
+                   RealEstateId = x.RealEstateId
+               }).ToArray()
+
             };
 
             var result = await _realEstateServices.Create(dto);
@@ -247,9 +256,9 @@ namespace ShopTARpe25.Controllers
             {
                 Id = vm.ImageId
             };
-            
+
             var image = await _fileService.RemoveImageFromDatabase(dto);
-            
+
             var realEstatedId = image.RealEstateId;
 
             if (image == null)
