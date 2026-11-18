@@ -249,6 +249,8 @@ namespace ShopTARpe25.Controllers
             };
             
             var image = await _fileService.RemoveImageFromDatabase(dto);
+            
+            var realEstatedId = image.RealEstateId;
 
             if (image == null)
             {

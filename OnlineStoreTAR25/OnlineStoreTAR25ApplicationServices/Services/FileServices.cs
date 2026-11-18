@@ -148,6 +148,8 @@ namespace ShopTARpe25.ApplicationServices.Services
 
         public async Task<FileToDatabase> RemoveImageFromDatabase(FileToDatabaseDto dto)
         {
+            //faili kustutamine id abil
+            //kasutage FirstOrDefaultAsync
             var image = await _context.FileToDatabases
                 .FirstOrDefaultAsync(x => x.Id == dto.Id);
 
