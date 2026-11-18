@@ -44,6 +44,9 @@
         {
             <div>
                 <partial name="_Images" model="image" />
+                <input asp-action="RemoveImage" asp-controller="RealEstate"
+                       asp-route-imageId="@image.ImageId" asp-route-realEstateId="@Model.Id"
+                       type="submit" class="btn btn-sm btn-outline-danger w-100 mt-2" value="Remove" />
             </div>
         }
     </div>

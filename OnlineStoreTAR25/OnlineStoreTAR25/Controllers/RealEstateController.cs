@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
@@ -12,13 +11,16 @@ namespace ShopTARpe25.Controllers
     {
         private readonly ShopTARpe25Context _context;
         private readonly IRealEstateServices _realEstateServices;
+        private readonly IFileServices _fileService;
 
         public RealEstateController(
             IRealEstateServices realEstateServices,
-            ShopTARpe25Context context)
+            ShopTARpe25Context context,
+            IFileServices fileService)
         {
             _context = context;
             _realEstateServices = realEstateServices;
+            _fileService = fileService;
         }
 
 
@@ -42,7 +44,6 @@ namespace ShopTARpe25.Controllers
         }
 
 
-        // CREATE GET
         [HttpGet]
         public IActionResult Create()
         {
@@ -51,16 +52,9 @@ namespace ShopTARpe25.Controllers
             return View("CreateUpdate", vm);
         }
 
-        // CREATE POST
         [HttpPost]
-        public async Task<IActionResult> Create(
-            RealEstateCreateUpdateViewModel vm)
+        public async Task<IActionResult> Create(RealEstateCreateUpdateViewModel vm)
         {
-            if (!ModelState.IsValid)
-            {
-                return View("CreateUpdate", vm);
-            }
-
             var dto = new RealEstateDto
             {
                 Area = vm.Area,
@@ -74,28 +68,33 @@ namespace ShopTARpe25.Controllers
 
             if (result == null)
             {
-                ModelState.AddModelError(
-                    "", "Real estate creation failed.");
-
-                return View("CreateUpdate", vm);
+                return RedirectToAction(nameof(Index));
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // DETAILS
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
-            var realEstate =
-                await _realEstateServices.DetailAsync(id);
+            var realEstate = await _realEstateServices.DetailAsync(id);
 
             if (realEstate == null)
             {
                 return NotFound();
             }
 
-            var images = await FileFromDatabase(id);
+            var images = await _context.FileToDatabases
+                .Where(x => x.RealEstateId == id)
+                .Select(y => new RealEstateImageViewModel
+                {
+                    ImageId = y.Id,
+                    RealEstateId = y.RealEstateId,
+                    ImageTitle = y.ImageTitle,
+                    ImageData = y.ImageData,
+                    Image = string.Format("data:image/jpeg;base64,{0}",
+                        Convert.ToBase64String(y.ImageData))
+                }).ToArrayAsync();
 
             var vm = new RealEstateDetailsViewModel
             {
@@ -113,19 +112,27 @@ namespace ShopTARpe25.Controllers
             return View(vm);
         }
 
-        // UPDATE GET
         [HttpGet]
         public async Task<IActionResult> Update(Guid id)
         {
-            var realEstate =
-                await _realEstateServices.DetailAsync(id);
+            var realEstate = await _realEstateServices.DetailAsync(id);
 
             if (realEstate == null)
             {
                 return NotFound();
             }
 
-            var images = await FileFromDatabase(id);
+            var images = await _context.FileToDatabases
+                .Where(x => x.RealEstateId == id)
+                .Select(y => new RealEstateImageViewModel
+                {
+                    ImageId = y.Id,
+                    RealEstateId = y.RealEstateId,
+                    ImageTitle = y.ImageTitle,
+                    ImageData = y.ImageData,
+                    Image = string.Format("data:image/jpeg;base64,{0}",
+                        Convert.ToBase64String(y.ImageData))
+                }).ToArrayAsync();
 
             var vm = new RealEstateCreateUpdateViewModel
             {
@@ -143,22 +150,9 @@ namespace ShopTARpe25.Controllers
             return View("CreateUpdate", vm);
         }
 
-        // UPDATE POST
         [HttpPost]
-        public async Task<IActionResult> Update(
-            RealEstateCreateUpdateViewModel vm)
+        public async Task<IActionResult> Update(RealEstateCreateUpdateViewModel vm)
         {
-            if (!ModelState.IsValid)
-            {
-                if (vm.Id.HasValue)
-                {
-                    vm.Image = (await FileFromDatabase(
-                        vm.Id.Value)).ToList();
-                }
-
-                return View("CreateUpdate", vm);
-            }
-
             if (!vm.Id.HasValue)
             {
                 return BadRequest();
@@ -182,23 +176,30 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
-            return RedirectToAction(nameof(Details),
-                new { id = vm.Id });
+            return RedirectToAction(nameof(Details), new { id = vm.Id });
         }
 
-        // DELETE GET
         [HttpGet]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var realEstate =
-                await _realEstateServices.DetailAsync(id);
+            var realEstate = await _realEstateServices.DetailAsync(id);
 
             if (realEstate == null)
             {
                 return NotFound();
             }
 
-            var images = await FileFromDatabase(id);
+            var images = await _context.FileToDatabases
+                .Where(x => x.RealEstateId == id)
+                .Select(y => new RealEstateImageViewModel
+                {
+                    ImageId = y.Id,
+                    RealEstateId = y.RealEstateId,
+                    ImageTitle = y.ImageTitle,
+                    ImageData = y.ImageData,
+                    Image = string.Format("data:image/jpeg;base64,{0}",
+                        Convert.ToBase64String(y.ImageData))
+                }).ToArrayAsync();
 
             var vm = new RealEstateDeleteViewModel
             {
@@ -216,12 +217,10 @@ namespace ShopTARpe25.Controllers
             return View(vm);
         }
 
-        // DELETE CONFIRMATION
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmation(Guid id)
         {
-            var realEstate =
-                await _realEstateServices.DetailAsync(id);
+            var realEstate = await _realEstateServices.DetailAsync(id);
 
             if (realEstate == null)
             {
@@ -241,67 +240,22 @@ namespace ShopTARpe25.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // REMOVE ONE IMAGE
         [HttpPost]
-        public async Task<IActionResult> RemoveImage(
-            Guid imageId, Guid realEstateId)
+        public async Task<IActionResult> RemoveImage(RealEstateImageViewModel vm)
         {
-            var image = await _context.FileToDatabases
-                .FirstOrDefaultAsync(x =>
-                    x.Id == imageId &&
-                    x.RealEstateId == realEstateId);
+            var dto = new FileToDatabaseDto()
+            {
+                Id = vm.ImageId
+            };
+            
+            var image = await _fileService.RemoveImageFromDatabase(dto);
 
             if (image == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Index));
             }
 
-            _context.FileToDatabases.Remove(image);
-
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Update),
-                new { id = realEstateId });
+            return RedirectToAction(nameof(Update), new { id = vm.RealEstateId });
         }
-
-
-        private async Task<RealEstateImageViewModel[]> FileFromDatabase(Guid id)
-        {
-            // Kõigepealt võtame pildid andmebaasist
-            var files = await _context.FileToDatabases
-                .Where(x => x.RealEstateId == id)
-                .ToListAsync();
-
-            // Seejärel teisendame pildid Base64 kujule
-            var result = files.Select(y =>
-            {
-                var extension = Path.GetExtension(y.ImageTitle ?? "")
-                    .ToLowerInvariant();
-
-                var contentType = extension switch
-                {
-                    ".png" => "image/png",
-                    ".gif" => "image/gif",
-                    ".webp" => "image/webp",
-                    ".bmp" => "image/bmp",
-                    _ => "image/jpeg"
-                };
-
-                return new RealEstateImageViewModel
-                {
-                    ImageId = y.Id,
-                    RealEstateId = y.RealEstateId,
-                    ImageData = y.ImageData,
-                    ImageTitle = y.ImageTitle,
-
-                    Image = y.ImageData != null
-                        ? $"data:{contentType};base64,{Convert.ToBase64String(y.ImageData)}"
-                        : null
-                };
-            }).ToArray();
-
-            return result;
-        }
-
     }
 }
