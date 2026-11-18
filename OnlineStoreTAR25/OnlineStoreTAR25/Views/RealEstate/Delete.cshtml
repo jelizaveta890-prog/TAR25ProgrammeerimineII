@@ -19,6 +19,21 @@
         <dt class="col-sm-3">ModifiedAt</dt>
         <dd class="col-sm-9">@Model.ModifiedAt?.ToString("dd.MM.yyyy HH:mm")</dd>
     </dl>
+    <hr />
+
+    <h5>Property images</h5>
+
+    <div class="row">
+        @foreach (var image in Model.Images)
+        {
+            <partial name="_Images" model="image" />
+        }
+    </div>
+
+    @if (!Model.Images.Any())
+    {
+        <p class="text-muted">No images available.</p>
+    }
 
     <form asp-action="DeleteConfirmation" class="mt-4 d-flex gap-2">
         <input type="hidden" asp-for="Id" />

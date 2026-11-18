@@ -8,7 +8,11 @@
     <h2>@(isUpdate ? "Update real estate" : "New real estate")</h2>
 </div>
 
-<form method="post" class="card-soft">
+<form method="post"
+      enctype="multipart/form-data"
+      asp-controller="RealEstate"
+      asp-action="@(isUpdate ? "Update" : "Create")"
+      class="card-soft">
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="CreatedAt" />
 

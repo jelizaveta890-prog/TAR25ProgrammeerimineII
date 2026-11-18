@@ -1,6 +1,18 @@
 ﻿@model ShopTARpe25.Models.RealEstate.RealEstateImageViewModel
 
-<div class="from-group row col-sm-4 offset-2">
-    <div>@Model.ImageTitle</div>
-    <img class="card-img-top" src="@Model.Image" asp-append-version="true" />
+<div class="col-md-4 mb-3">
+    <div class="card h-100">
+
+        <img src="@Model.Image"
+             alt="@Model.ImageTitle"
+             class="card-img-top"
+             style="height: 220px; object-fit: cover;" />
+
+        <div class="card-body">
+            <p class="card-text">
+                @Model.ImageTitle
+            </p>
+        </div>
+
+    </div>
 </div>

@@ -264,27 +264,44 @@ namespace ShopTARpe25.Controllers
                 new { id = realEstateId });
         }
 
-        // GET IMAGES FROM DATABASE
-        private async Task<RealEstateImageViewModel[]>
-            FileFromDatabase(Guid id)
+
+        private async Task<RealEstateImageViewModel[]> FileFromDatabase(Guid id)
         {
-            var result = await _context.FileToDatabases
+            // Kõigepealt võtame pildid andmebaasist
+            var files = await _context.FileToDatabases
                 .Where(x => x.RealEstateId == id)
-                .Select(y => new RealEstateImageViewModel
+                .ToListAsync();
+
+            // Seejärel teisendame pildid Base64 kujule
+            var result = files.Select(y =>
+            {
+                var extension = Path.GetExtension(y.ImageTitle ?? "")
+                    .ToLowerInvariant();
+
+                var contentType = extension switch
+                {
+                    ".png" => "image/png",
+                    ".gif" => "image/gif",
+                    ".webp" => "image/webp",
+                    ".bmp" => "image/bmp",
+                    _ => "image/jpeg"
+                };
+
+                return new RealEstateImageViewModel
                 {
                     ImageId = y.Id,
                     RealEstateId = y.RealEstateId,
                     ImageData = y.ImageData,
                     ImageTitle = y.ImageTitle,
 
-                    Image = string.Format(
-                        "data:image/jpeg;base64,{0}",
-                        Convert.ToBase64String(y.ImageData)
-                    )
-                })
-                .ToArrayAsync();
+                    Image = y.ImageData != null
+                        ? $"data:{contentType};base64,{Convert.ToBase64String(y.ImageData)}"
+                        : null
+                };
+            }).ToArray();
 
             return result;
         }
+
     }
 }
