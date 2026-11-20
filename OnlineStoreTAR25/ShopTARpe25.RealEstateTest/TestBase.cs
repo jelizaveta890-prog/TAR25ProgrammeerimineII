@@ -11,16 +11,16 @@ namespace ShopTARpe25.RealEstateTest
     // Abstraktne baasklass testidele – loob ühtse keskkonna, et koodi mitte korrata
     public abstract class TestBase 
     {
-       // Hoiab valmis ehitatud teenuste konteinerit, kust testid saavad vajalikke objekte küsida
         protected IServiceProvider ServiceProvider { get; set; }
 
 
-        // Konstruktor: käivitub automaatselt iga testi alguses ja seab teenused valmis
         protected TestBase()
         {
+            //loob uue teenuse kogu vajalikuks teenuste testimiseks
             var services = new ServiceCollection();
+            //kutsub välja meetodi, mis lsab teenused ja vajalikud sõltuvused
             SetupServices(services);
-            // Ehitab registreeritud teenustest töötava konteineri
+            //selle kaudu saab teenuseid küsida 
             ServiceProvider = services.BuildServiceProvider();
         }
 
@@ -28,45 +28,53 @@ namespace ShopTARpe25.RealEstateTest
         // Registreerib testide jaoks vajalikud teenused ja andmebaasi
         public virtual void SetupServices(IServiceCollection services)
         {
-            // Seob liidese IRealEstateServices tema tegeliku teostusega (RealEstateServices)
             services.AddScoped<IRealEstateServices, RealEstateServices>();
-            // Seadistab päris SQL-andmebaasi asemele ajutise mälupõhise (In-Memory) andmebaasi
+
+            //registreerib andmebaasi konteksti
             services.AddDbContext<ShopTARpe25Context>(x =>
             {
+                //seadistab kasutama mälusisest andmebaasi nimega TEST, et testimisel kasutada
+                //ilm päris andmebaasita
                 x.UseInMemoryDatabase("TEST");
-                // Eirab transaktsioonide hoiatusi, kuna mälupõhine andmebaas neid ei toeta
+
+                //eriab hoiatust, et mälusisena DB ei toeta tehinguid samamoodi nau päris andmebaas
                 x.ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
             });
-
+            //kutsub välja macrode klassi
             RegisterMacros(services);
         }
 
 
-        // Vabastab ressursid pärast testi lõppu
+        // Vabastab ressursid peale kasutamist
         public void Dispose()
         {
 
         }
 
 
-        // Abimeetod, millega saab konteinerist kiiresti soovitud teenuse kätte (nt Svc<IRealEstateServices>())
+        //abimeetodit, millega klass ja selle alamklassid saavad teenuse tööbi järgi küsida
         protected T Svc<T>()
         {
+            //otsib teenusepakkuja tüüpi
             return ServiceProvider.GetService<T>();
         }
 
-
-        // Otsib projektist automaatselt üles kõik IMacros liidest kasutavad abiklassid ja registreerib need
+        //abimeetodit makrode leidmiseks ja registreerimiseks
         private void RegisterMacros(IServiceCollection services)
         {
+            //saaks reflektsiooni otsingus kasutada 
             var macroBaseType = typeof(IMacros);
-            // Leiab kõik konkreetsed klassid (mitte liidesed ega abstraktsed klassid), mis pärinevad IMacros liidesest
+            
+            //loeb kokku kõik tüübid sellest assemblyst, kus Macro on määretletud
             var macros = macroBaseType.Assembly.GetTypes()
+                //valib tüübid, mis rakendavad IMacro liidest, aga ei ole ise liides
+                //ega abstraktsed klassid 
                 .Where(t => macroBaseType.IsAssignableFrom(t)
                 && !t.IsInterface && !t.IsAbstract);
-            // Registreerib iga leitud makroklassi ühekordse instantsina (Singleton)
+            // käib leitud makrode classid ükshaaval läbi
             foreach (var macro in macros)
             {
+                //kasutab ühte macro ehk eksemplaari 
                 services.AddSingleton(macro);
             }
         }
