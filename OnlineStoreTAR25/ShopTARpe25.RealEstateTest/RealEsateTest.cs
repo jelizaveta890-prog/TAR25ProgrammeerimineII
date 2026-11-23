@@ -1,5 +1,6 @@
 ﻿using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
+using ShopTARpe25.Core.ServiceInterface;
 
 namespace ShopTARpe25.RealEstateTest
 {
@@ -20,6 +21,10 @@ namespace ShopTARpe25.RealEstateTest
             };
 
             //Act Siin tuleb kutsuda RealEstate Create meetodi välja
+            var result = await Svc<IRealEstateServices>().Create(dto);
+
+            //Assert
+            Assert.NotNull(result);
 
         }
     }
