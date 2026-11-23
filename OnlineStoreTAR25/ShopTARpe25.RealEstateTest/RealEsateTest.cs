@@ -1,5 +1,4 @@
-﻿using ShopTARpe25.Core.Domain;
-using ShopTARpe25.Core.Dto;
+﻿using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 
 namespace ShopTARpe25.RealEstateTest
@@ -26,6 +25,21 @@ namespace ShopTARpe25.RealEstateTest
             //Assert
             Assert.NotNull(result);
 
+        }
+
+        //teha test, kus otsib ankeeti id alusel, aga seda ei ole andmebaasis
+        [Fact]
+        public async Task Should_GetByIdRealEstate_WhenReturnsNotEqual()
+        {
+            //Arrange   
+            Guid databaseGuid = Guid.Parse("fe2faf0f-f8c1-42b3-a907-9b23d0666fc0");
+            Guid wrongGuid = Guid.NewGuid();
+
+            //Act
+            var result = await Svc<IRealEstateServices>().DetailAsync(id);
+
+            //Assert
+            Assert.Null(result);
         }
     }
 }
