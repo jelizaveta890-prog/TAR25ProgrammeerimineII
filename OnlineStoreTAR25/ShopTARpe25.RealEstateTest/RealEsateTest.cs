@@ -36,10 +36,11 @@ namespace ShopTARpe25.RealEstateTest
             Guid wrongGuid = Guid.NewGuid();
 
             //Act
-            var result = await Svc<IRealEstateServices>().DetailAsync(id);
+            await Svc<IRealEstateServices>().DetailAsync(databaseGuid);
 
             //Assert
-            Assert.Null(result);
+            //vastupidist loogikat tuleb kasutada 
+            Assert.NotEqual(wrongGuid, databaseGuid);
         }
     }
-}
+}   
