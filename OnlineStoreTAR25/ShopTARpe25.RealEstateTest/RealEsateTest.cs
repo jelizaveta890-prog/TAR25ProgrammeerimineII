@@ -74,6 +74,7 @@ namespace ShopTARpe25.RealEstateTest
             var deleteRealEstate = await Svc<IRealEstateServices>().Delete((Guid)addRealEstate.Id);
 
             //Assert
+            //võrdlen Id-sid, kas kustutasin selle ära, mis oli andmebaasis
             Assert.Equal(deleteRealEstate.Id, addRealEstate.Id);
 
         }
