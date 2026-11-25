@@ -28,8 +28,9 @@ namespace ShopTARpe25.RealEstateTest
         }
 
         //teha test, kus otsib ankeeti id alusel, aga seda ei ole andmebaasis
+        //tuli vaade, mis ei sobi rakenduse jaoks.
         [Fact]
-        public async Task Should_GetByIdRealEstate_WhenReturnsNotEqual()
+        public async Task ShouldNot_GetByIdRealEstate_WhenReturnsNotEqual()
         {
             //Arrange   
             Guid databaseGuid = Guid.Parse("fe2faf0f-f8c1-42b3-a907-9b23d0666fc0");
@@ -42,5 +43,9 @@ namespace ShopTARpe25.RealEstateTest
             //vastupidist loogikat tuleb kasutada 
             Assert.NotEqual(wrongGuid, databaseGuid);
         }
+
+        [Fact]
+        //mul on vaja testida DetailsAsync meetodit
+    
     }
 }   
