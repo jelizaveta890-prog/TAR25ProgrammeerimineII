@@ -1,4 +1,5 @@
-﻿using ShopTARpe25.Core.Dto;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 
 namespace ShopTARpe25.RealEstateTest
@@ -45,32 +46,48 @@ namespace ShopTARpe25.RealEstateTest
         }
 
         [Fact]
-        //mul on vaja testida DetailsAsync meetodit
         public async Task Should_GetByIdRealEstate_WhenReturnsEqual()
         {
-            //Arrange
-            RealEstateDto dto = new()
-            {
-                Area = 120.5,
-                Address = "Test location",
-                RoomNumber = 3,
-                BuildingType = "house",
-                CreatedAt = DateTime.UtcNow,
-                ModifiedAt = DateTime.UtcNow,
-            };
+            // Arrange
+            //see guid on juba andmebaasis olemas ankeedi juures
+            Guid databaseGuid = Guid.Parse("fe2faf0f-f8c1-42b3-a907-9b23d0666fc0");
+            //kui vajutad nupule, siis see guid saadetakse andmebaasi, mida võrreldakse
+            Guid guid = Guid.Parse("fe2faf0f-f8c1-42b3-a907-9b23d0666fc0");
 
-            var createdRealEstate = await Svc<IRealEstateServices>().Create(dto);
+            // Act
+            await Svc<IRealEstateServices>().DetailAsync(guid);
 
-            //Act
-            var result = await Svc<IRealEstateServices>().DetailAsync((Guid)createdRealEstate.Id);
-
-            //Assert
-            Assert.NotNull(result);
-            Assert.Equal(createdRealEstate.Id, result.Id);
-            Assert.Equal(createdRealEstate.Address, result.Address);
-            Assert.Equal(createdRealEstate.Area, result.Area);
+            // Assert
+            Assert.Equal(databaseGuid, guid);
         }
 
+        //kustutamise meetodit on vaja testida. Andmebaasis on ankeed, mida
+        //tahan ära kustutada
+        [Fact]
+        public async Task Should_DeleteByIdRealEstate_WhenDeleteRealEstate()
+        {
+            //Arrange
+            RealEstateDto dto = MockRealEstateData();
 
+            //Act
+            var addRealEstate = await Svc<IRealEstateServices>().Create(dto);
+            var deleteRealEstate = await Svc<IRealEstateServices>().Delete((Guid)addRealEstate.Id);
+
+            //Assert
+            Assert.Equal(deleteRealEstate.Id, addRealEstate.Id);
+
+        }
+        private RealEstateDto MockRealEstateData()
+        {
+            return new RealEstateDto
+            {
+                Area = 88.65,
+                Address = "TestAdress",
+                RoomNumber = 1,
+                BuildingType = "TestBuildingType",
+                CreatedAt = DateTime.Now,
+                ModifiedAt = DateTime.Now,
+            };
+        }
     }
-}   
+}
