@@ -46,6 +46,31 @@ namespace ShopTARpe25.RealEstateTest
 
         [Fact]
         //mul on vaja testida DetailsAsync meetodit
-    
+        public async Task Should_GetByIdRealEstate_WhenReturnsEqual()
+        {
+            //Arrange
+            RealEstateDto dto = new()
+            {
+                Area = 120.5,
+                Address = "Test location",
+                RoomNumber = 3,
+                BuildingType = "house",
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow,
+            };
+
+            var createdRealEstate = await Svc<IRealEstateServices>().Create(dto);
+
+            //Act
+            var result = await Svc<IRealEstateServices>().DetailAsync((Guid)createdRealEstate.Id);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.Equal(createdRealEstate.Id, result.Id);
+            Assert.Equal(createdRealEstate.Address, result.Address);
+            Assert.Equal(createdRealEstate.Area, result.Area);
+        }
+
+
     }
 }   
