@@ -149,9 +149,6 @@ namespace ShopTARpe25.RealEstateTest
         }
 
 
-
-
-
         //kasutame akeeti, kus kõik andmed on NULL 
         //tuleb kasutada Created ja Update Ära
         [Fact]
@@ -166,11 +163,6 @@ namespace ShopTARpe25.RealEstateTest
             Assert.NotEqual(createdRealEstate.Id, result.Id);
             Assert.NotEqual(createdRealEstate.Address, result.Address);
         }
-
-
-
-
-
 
 
         private RealEstateDto MockRealEstateData()
