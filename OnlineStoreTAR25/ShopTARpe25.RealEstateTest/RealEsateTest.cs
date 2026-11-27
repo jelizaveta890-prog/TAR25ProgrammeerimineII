@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
+using ShopTARpe25.Data.Migrations;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ShopTARpe25.RealEstateTest
 {
@@ -79,7 +81,7 @@ namespace ShopTARpe25.RealEstateTest
 
         }
         //mul on kaks ankeeti loodud ja ühe kustutan ära 
-        //assertis võdlen, kas need kaks on ühesugused
+        //assertis võrdlen, kas need kaks on ühesugused
         [Fact]
         public async Task ShouldNot_DeleteByIdRealEstate_WhenDidNotDeleteRealEstate()
         {
@@ -127,11 +129,49 @@ namespace ShopTARpe25.RealEstateTest
             Assert.DoesNotMatch(dto.RoomNumber.ToString(), domain.RoomNumber.ToString());
             Assert.DoesNotMatch(dto.Address, domain.Address);
         }
+        
         //[Fact]
         public async Task Should_UpdateRealEstate_WhenUpdateDataVersion2()
-        {
+        { 
+ 
+            //tuleb kasutada MockRealEstateDataUpdate ja MockRealEstateData2
+            // Arrange
+            RealEstateDto dto = MockRealEstateData2();
+            RealEstateDto updateDto = MockRealEstateDataUpdate();
 
+            // Act
+            var createdRealEstate = await Svc<IRealEstateServices>().Create(dto);
+            var result = await Svc<IRealEstateServices>().Update(updateDto);
+
+            // Assert
+            Assert.DoesNotMatch(createdRealEstate.Address, result.Address);
+            Assert.NotEqual(createdRealEstate.ModifiedAt, result.ModifiedAt);
         }
+
+
+
+
+
+        //kasutame akeeti, kus kõik andmed on NULL 
+        //tuleb kasutada Created ja Update Ära
+        [Fact]
+        public async Task ShouldNot_UpdateRealEstate_WhenDidNotUpdateData ()
+        {
+            RealEstateDto dto = MockRealEstateData();
+            RealEstateDto nullDto = MockNullRealEstateData();
+
+            var createdRealEstate = await Svc<IRealEstateServices>().Create(dto);
+            var result = await Svc<IRealEstateServices>().Update(nullDto);
+
+            Assert.NotEqual(createdRealEstate.Id, result.Id);
+            Assert.NotEqual(createdRealEstate.Address, result.Address);
+        }
+
+
+
+
+
+
 
         private RealEstateDto MockRealEstateData()
         {
@@ -143,6 +183,44 @@ namespace ShopTARpe25.RealEstateTest
                 BuildingType = "TestBuildingType",
                 CreatedAt = DateTime.Now,
                 ModifiedAt = DateTime.Now,
+            };
+        }
+        private RealEstateDto MockRealEstateData2()
+        {
+            return new RealEstateDto
+            {
+                Area = 120.00,
+                Address = "Sample Adress",
+                RoomNumber = 8,
+                BuildingType = "House",
+                CreatedAt = DateTime.Now,
+                ModifiedAt = DateTime.Now,
+            };
+        }
+
+        private RealEstateDto MockRealEstateDataUpdate()
+        {
+            return new RealEstateDto
+            {
+                Area = 100.00,
+                Address = "Woodland",
+                RoomNumber = 2,
+                BuildingType = "Hideout",
+                CreatedAt = DateTime.Now,
+                ModifiedAt = DateTime.Now,
+            };
+        }
+
+        private RealEstateDto MockNullRealEstateData()
+        {
+            return new RealEstateDto
+            {
+                Area = null,
+                Address = null,
+                RoomNumber = 0,
+                BuildingType = null,
+                CreatedAt = null,
+                ModifiedAt = null,
             };
         }
     }
